@@ -2,17 +2,24 @@ import PluginBase from '../abstracts/PluginBase';
 import Singleton from '../abstracts/Singleton';
 import PluginLoader from './PluginLoader';
 
-// import Cookie from '../utilities/Cookie';
-// import JsonParser from '../utilities/JsonParser';
-// import Sanitizer from '../utilities/Sanitizer';
-// import Url from '../utilities/Url';
+import Configurable from '../traits/Configurable';
+import FiresEvents from '../traits/FiresEvents';
+import AssetLoader from '../utilities/AssetLoader';
+import Cookie from '../utilities/Cookie';
+import JsonParser from '../utilities/JsonParser';
+import Sanitizer from '../utilities/Sanitizer';
+import Url from '../utilities/Url';
 
 /**
- * Snowboard - the Winter JavaScript framework.
+ * Snowboard.js framework.
  *
- * This class represents the base of a modern take on the Winter JS framework, being fully extensible and taking advantage
- * of modern JavaScript features by leveraging the Laravel Mix compilation framework. It also is coded up to remove the
- * dependency of jQuery.
+ * Originally designed for [Winter CMS](https://wintercms.com), this framework represents the base
+ * of a modern take on Javascript functionality management, with a focus on extensibility and
+ * reusability without putting any restrictions on UI, and sharing many common practices with PHP
+ * development.
+ *
+ * This version of the framework has been written as a standalone framework, untied to Winter CMS,
+ * and can therefore be used in any web-based project.
  *
  * @copyright 2021 Winter.
  * @author Ben Thomson <git@alfreido.com>
@@ -22,13 +29,12 @@ export default class Snowboard {
     /**
      * Constructor.
      *
-     * @param {boolean} autoSingletons Automatically load singletons when DOM is ready. Default: `true`.
      * @param {boolean} debug Whether debugging logs should be shown. Default: `false`.
      */
-    constructor(autoSingletons, debug) {
+    constructor(debug) {
         this.debugEnabled = (typeof debug === 'boolean' && debug === true);
-        this.autoInitSingletons = (typeof autoSingletons === 'boolean' && autoSingletons === false);
         this.plugins = {};
+        this.traits = {};
         this.listeners = {};
         this.foundBaseUrl = null;
         this.readiness = {
@@ -42,7 +48,7 @@ export default class Snowboard {
         Object.freeze(Snowboard.prototype);
         Object.freeze(this);
 
-        this.loadUtilities();
+        this.loadInbuilt();
         this.initialise();
 
         this.debug('Snowboard framework initialised');
@@ -51,8 +57,10 @@ export default class Snowboard {
     /**
      * Attaches abstract classes as properties of the Snowboard class.
      *
-     * This will allow Javascript functionality with no build process to still extend these abstracts by prefixing
-     * them with "Snowboard".
+     * This will allow Javascript functionality with no build process to still extend these
+     * abstracts by prefixing them with "Snowboard".
+     *
+     * For example:
      *
      * ```
      * class MyClass extends Snowboard.PluginBase {
@@ -71,26 +79,27 @@ export default class Snowboard {
     }
 
     /**
-     * Loads the default utilities.
+     * Loads the default traits and utilities.
      */
-    loadUtilities() {
-        // this.addPlugin('cookie', Cookie);
-        // this.addPlugin('jsonParser', JsonParser);
-        // this.addPlugin('sanitizer', Sanitizer);
-        // this.addPlugin('url', Url);
+    loadInbuilt() {
+        this.registerTrait('configurable', Configurable);
+        this.registerTrait('firesEvents', FiresEvents);
+        this.addPlugin('assetLoader', AssetLoader);
+        this.addPlugin('cookie', Cookie);
+        this.addPlugin('jsonParser', JsonParser);
+        this.addPlugin('sanitizer', Sanitizer);
+        this.addPlugin('url', Url);
     }
 
     /**
      * Initialises the framework.
      *
-     * Attaches a listener for the DOM being ready and triggers a global "ready" event for plugins to begin attaching
-     * themselves to the DOM.
+     * Attaches a listener for the DOM being ready and triggers a global "ready" event for plugins
+     * to begin attaching themselves to the DOM.
      */
     initialise() {
         window.addEventListener('DOMContentLoaded', () => {
-            if (this.autoInitSingletons) {
-                this.initialiseSingletons();
-            }
+            this.initialiseSingletons();
             this.globalEvent('ready');
             this.readiness.dom = true;
         });
@@ -110,13 +119,16 @@ export default class Snowboard {
     /**
      * Adds a plugin to the framework.
      *
-     * Plugins are the cornerstone for additional functionality for Snowboard. A plugin must either be an ES2015 class
-     * that extends the PluginBase or Singleton abstract classes, or a simple callback function.
+     * Plugins are the cornerstone for additional functionality for Snowboard. A plugin must either
+     * be an ES2015 class that extends the `PluginBase` or `Singleton` abstract classes, or a simple
+     * callback function.
      *
-     * When a plugin is added, it is automatically assigned as a new magic method in the Snowboard class using the name
-     * parameter, and can be called via this method. This method will always be the "lowercase" version of this name.
+     * When a plugin is added, it is automatically assigned as a new magic method in the Snowboard
+     * class using the name parameter, and can be called via this method. This method will always be
+     * the "lowercase" version of this name.
      *
-     * For example, if a plugin is assigned to the name "myPlugin", it can be called via `Snowboard.myplugin()`.
+     * For example, if a plugin is assigned to the name "myPlugin", it can be called via
+     * `Snowboard.myplugin()`.
      *
      * @param {string} name
      * @param {PluginBase|Function} instance
@@ -140,8 +152,8 @@ export default class Snowboard {
 
         this.debug(`Plugin "${name}" registered`);
 
-        // Check if any singletons now have their dependencies fulfilled, and fire their "ready" handler if we're
-        // in a ready state.
+        // Check if any singletons now have their dependencies fulfilled, and fire their "ready"
+        // handler if we're in a ready state.
         Object.values(this.getPlugins()).forEach((plugin) => {
             if (
                 plugin.isSingleton()
@@ -160,7 +172,8 @@ export default class Snowboard {
     /**
      * Removes a plugin.
      *
-     * Removes a plugin from Snowboard, calling the destructor method for all active instances of the plugin.
+     * Removes a plugin from Snowboard, calling the destructor method for all active instances of
+     * the plugin.
      *
      * @param {string} name
      * @returns {void}
@@ -233,9 +246,62 @@ export default class Snowboard {
     }
 
     /**
+     * Registers a trait with the framework.
+     *
+     * Traits are reusable classes that are merged into plugins that implement them. Upon
+     * initialization of a plugin or singleton instance, after the instance is constructed, all
+     * traits that are to be used will also be constructed, and their methods and properties will
+     * be merged into the plugin instance.
+     *
+     * @param {string} name
+     * @param {Object} instance
+     */
+    registerTrait(name, instance) {
+        const lowerName = name.toLowerCase();
+
+        if (this.hasTrait(lowerName)) {
+            throw new Error(`A trait called "${name}" is already registered.`);
+        }
+
+        if (typeof instance !== 'function') {
+            throw new Error('The provided trait must be a class.');
+        }
+
+        if (this[name] !== undefined || this[lowerName] !== undefined) {
+            throw new Error('The given name is already in use for a property or method of the Snowboard class.');
+        }
+
+        this.traits[lowerName] = instance;
+
+        this.debug(`Trait "${name}" registered`);
+    }
+
+    /**
+     * Determines if a trait has been registered.
+     *
+     * @param {string} name
+     * @returns {boolean}
+     */
+    hasTrait(name) {
+        const lowerName = name.toLowerCase();
+
+        return (this.traits[lowerName] !== undefined);
+    }
+
+    /**
+     * Returns an array of registered traits as individual class objects.
+     *
+     * @returns {Object[]}
+     */
+    getTraits() {
+        return this.traits;
+    }
+
+    /**
      * Finds all plugins that listen to the given event.
      *
-     * This works for both normal and promise events. It does NOT check that the plugin's listener actually exists.
+     * This works for both normal and promise events. It does NOT check that the plugin's listener
+     * actually exists.
      *
      * @param {string} eventName
      * @returns {string[]} The name of the plugins that are listening to this event.
@@ -354,7 +420,8 @@ export default class Snowboard {
 
             const listenMethod = plugin.callMethod('listens')[eventName];
 
-            // Call event handler methods for all plugins, if they have a method specified for the event.
+            // Call event handler methods for all plugins, if they have a method specified for the
+            // event.
             plugin.getInstances().forEach((instance) => {
                 // If a plugin has cancelled the event, no further plugins are considered.
                 if (cancelled) {
@@ -425,7 +492,9 @@ export default class Snowboard {
     /**
      * Calls a global event to all registered plugins, expecting a Promise to be returned by all.
      *
-     * This collates all plugins responses into one large Promise that either expects all to be resolved, or one to reject.
+     * This collates all plugins responses into one large Promise that either expects all to be
+     * resolved, or one to reject.
+     *
      * If no listeners are found, a resolved Promise is returned.
      *
      * @param {string} eventName
@@ -455,7 +524,8 @@ export default class Snowboard {
 
             const listenMethod = plugin.callMethod('listens')[eventName];
 
-            // Call event handler methods for all plugins, if they have a method specified for the event.
+            // Call event handler methods for all plugins, if they have a method specified for the
+            // event.
             plugin.getInstances().forEach((instance) => {
                 if (typeof listenMethod === 'function') {
                     try {
@@ -587,11 +657,26 @@ export default class Snowboard {
     }
 
     /**
+     * Log a warning message.
+     *
+     * These messages are only shown when debugging is enabled.
+     *
+     * @returns {void}
+     */
+    warning(message, ...parameters) {
+        if (!this.debugEnabled) {
+            return;
+        }
+
+        this.logMessage('rgb(229, 179, 71)', true, message, ...parameters);
+    }
+
+    /**
      * Logs an error message.
      *
      * @returns {void}
      */
     error(message, ...parameters) {
-        this.logMessage('rgb(229, 35, 35)', true, message, ...parameters);
+        this.logMessage('rgb(211, 71, 71)', true, message, ...parameters);
     }
 }

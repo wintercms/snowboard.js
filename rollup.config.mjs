@@ -8,11 +8,13 @@ export default {
         {
             file: 'dist/snowboard.js',
             format: 'iife',
+            name: 'Snowboard',
         },
         {
             file: 'dist/snowboard.min.js',
             format: 'iife',
             plugins: [terser({ format: { comments: false } })],
+            name: 'Snowboard',
         },
     ],
     plugins: [

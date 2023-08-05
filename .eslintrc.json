@@ -14,7 +14,6 @@
         "indent": ["error", 4, {
             "SwitchCase": 1
         }],
-        "max-len": ["off"],
         "new-cap": ["error", { "properties": false }],
         "no-alert": ["off"],
         "no-plusplus": "off",
@@ -24,6 +23,7 @@
     },
     "ignorePatterns": [
         "rollup.config.mjs",
+        "tests/jest.config.js",
         "dist/"
     ],
     "overrides": [
