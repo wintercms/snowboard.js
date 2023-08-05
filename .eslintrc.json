@@ -22,6 +22,10 @@
             "props": false
         }]
     },
+    "ignorePatterns": [
+        "rollup.config.mjs",
+        "dist/"
+    ],
     "overrides": [
         {
             "files": ["tests/**"],

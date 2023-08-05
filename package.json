@@ -2,12 +2,15 @@
     "name": "@wintercms/snowboard",
     "version": "0.1.0",
     "description": "The Winter CMS Snowboard.js framework as a standalone module",
-    "main": "dist/snowboard.js",
+    "browser": "src/browser.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "jest --config tests/jest.config.js"
     },
     "author": "Ben Thomson <git@alfreido.com>",
     "license": "MIT",
+    "dependencies": {
+        "js-cookie": "^3.0.1"
+    },
     "devDependencies": {
         "@babel/core": "^7.16.0",
         "@babel/plugin-transform-runtime": "^7.16.4",
@@ -16,6 +19,7 @@
         "@babel/runtime": "^7.16.3",
         "@rollup/plugin-babel": "^6.0.3",
         "@rollup/plugin-node-resolve": "^15.1.0",
+        "@rollup/plugin-terser": "^0.4.3",
         "babel-plugin-module-resolver": "^5.0.0",
         "eslint": "^8.6.0",
         "eslint-config-airbnb-base": "^15.0.0",
