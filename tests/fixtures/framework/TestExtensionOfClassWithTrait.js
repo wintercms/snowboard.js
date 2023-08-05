@@ -1,5 +1,4 @@
-/* globals window */
-
+/* eslint-disable max-classes-per-file */
 ((Snowboard) => {
     class TestClassWithTrait extends Snowboard.PluginBase {
         construct() {
@@ -12,7 +11,7 @@
 
         traits() {
             return [
-                TestTrait
+                'TestTrait',
             ];
         }
     }
@@ -30,7 +29,7 @@
 
         traits() {
             return [
-                TestTraitTwo,
+                'TestTraitTwo',
             ];
         }
     }

@@ -164,7 +164,7 @@ describe('Snowboard framework', () => {
         Snowboard.removePlugin('testSingleton');
         expect(Snowboard.hasPlugin('testSingleton')).toEqual(false);
         expect(dom.window.Snowboard.getPluginNames()).not.toEqual(
-            expect.arrayContaining([ 'testsingleton']),
+            expect.arrayContaining(['testsingleton']),
         );
         expect(Snowboard.testSingleton).not.toBeDefined();
     });

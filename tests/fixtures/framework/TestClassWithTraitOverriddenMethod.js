@@ -1,5 +1,3 @@
-/* globals window */
-
 ((Snowboard) => {
     class TestClassWithTraitOverriddenMethod extends Snowboard.PluginBase {
         construct() {
@@ -17,7 +15,7 @@
 
         traits() {
             return [
-                TestTrait
+                'TestTrait',
             ];
         }
     }

@@ -1,5 +1,3 @@
-/* globals window */
-
 ((Snowboard) => {
     class TestDependencyTwo extends Snowboard.Singleton {
         testMethod() {

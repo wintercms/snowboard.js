@@ -1,6 +1,4 @@
-/* globals window */
-
-class TestTrait {
+export default class TestTrait {
     constructor() {
         this.traitProperty = 'Trait property';
     }
@@ -14,8 +12,8 @@ class TestTrait {
     }
 
     testInferredProperty() {
-        // The following property hasn't been defined in the trait, but will be defined in the classes
-        // that use it.
+        // The following property hasn't been defined in the trait, but will be defined in the
+        // classes that use it.
         return this.inferredProperty;
     }
 

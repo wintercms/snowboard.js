@@ -1,6 +1,4 @@
-/* globals window */
-
-class TestTraitTwo {
+export default class TestTraitTwo {
     constructor() {
         this.traitProperty = 'Trait two property';
         this.traitTwoProperty = 'Trait two property';

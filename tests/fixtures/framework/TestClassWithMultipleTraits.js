@@ -1,5 +1,3 @@
-/* globals window */
-
 ((Snowboard) => {
     class TestClassWithMultipleTraits extends Snowboard.PluginBase {
         construct() {
@@ -12,8 +10,8 @@
 
         traits() {
             return [
-                TestTrait,
-                TestTraitTwo,
+                'TestTrait',
+                'TestTraitTwo',
             ];
         }
     }
