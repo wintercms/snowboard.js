@@ -188,7 +188,7 @@ export default class Snowboard {
 
         // Call destructors for all instances
         this.plugins[lowerName].getInstances().forEach((instance) => {
-            instance.destruct();
+            instance.destructor();
         });
 
         delete this.plugins[lowerName];

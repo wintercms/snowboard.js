@@ -51,18 +51,21 @@ export default class PluginBase {
      *
      * Fired when this plugin is removed. Can be manually called if you have another scenario for
      * destruction, ie. the element attached to the plugin is removed or changed.
+     *
+     * This method should be treated as the true destructor of a plugin, and can be overwritten.
      */
     destruct() {
-        this.detach();
-        delete this.snowboard;
     }
 
     /**
-     * Plugin destructor (old method name).
+     * Plugin destructor (core)
      *
-     * Allows previous usage of the "destructor" method to still work.
+     * The destructor is provided the Snowboard framework instance, and should not be overwritten
+     * unless you absolutely know what you're doing.
      */
     destructor() {
         this.destruct();
+        this.detach();
+        delete this.snowboard;
     }
 }
