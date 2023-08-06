@@ -315,9 +315,6 @@ export default class Snowboard {
             if (!plugin.dependenciesFulfilled()) {
                 return;
             }
-            if (!plugin.hasMethod('listens')) {
-                return;
-            }
 
             const listeners = plugin.callMethod('listens');
 

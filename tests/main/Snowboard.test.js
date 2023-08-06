@@ -376,4 +376,22 @@ describe('Snowboard framework', () => {
             Snowboard.addPlugin('testPlugin', TestTrait);
         }).toThrow('must extend the PluginBase class');
     });
+
+    it('won\'t allow a plugin to be named the same as a core Snowboard method', () => {
+        expect(() => {
+            Snowboard.addPlugin('addPlugin', TestPlugin);
+        }).toThrow('already in use');
+
+        expect(() => {
+            Snowboard.addPlugin('getPlugins', TestPlugin);
+        }).toThrow('already in use');
+
+        expect(() => {
+            Snowboard.addPlugin('registerTrait', TestPlugin);
+        }).toThrow('already in use');
+
+        expect(() => {
+            Snowboard.addPlugin('listensToEvent', TestPlugin);
+        }).toThrow('already in use');
+    });
 });
