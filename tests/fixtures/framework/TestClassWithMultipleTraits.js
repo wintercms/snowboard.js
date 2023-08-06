@@ -1,20 +1,18 @@
-((Snowboard) => {
-    class TestClassWithMultipleTraits extends Snowboard.PluginBase {
-        construct() {
-            this.internalProperty = 'Internal property';
-        }
+import PluginBase from '../../../src/abstracts/PluginBase';
 
-        internalMethod() {
-            return 'Internal method called';
-        }
-
-        traits() {
-            return [
-                'TestTrait',
-                'TestTraitTwo',
-            ];
-        }
+export default class TestClassWithMultipleTraits extends PluginBase {
+    construct() {
+        this.internalProperty = 'Internal property';
     }
 
-    Snowboard.addPlugin('testClassWithMultipleTraits', TestClassWithMultipleTraits);
-})(window.Snowboard);
+    internalMethod() {
+        return 'Internal method called';
+    }
+
+    traits() {
+        return [
+            'TestTrait',
+            'TestTraitTwo',
+        ];
+    }
+}

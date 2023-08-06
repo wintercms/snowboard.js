@@ -1,4 +1,3 @@
-import PluginBase from '../abstracts/PluginBase';
 import Singleton from '../abstracts/Singleton';
 import InnerProxyHandler from './InnerProxyHandler';
 

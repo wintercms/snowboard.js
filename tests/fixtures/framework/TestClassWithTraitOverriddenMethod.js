@@ -1,24 +1,22 @@
-((Snowboard) => {
-    class TestClassWithTraitOverriddenMethod extends Snowboard.PluginBase {
-        construct() {
-            this.internalProperty = 'Internal property';
-            this.traitProperty = 'Overridden property';
-        }
+import PluginBase from '../../../src/abstracts/PluginBase';
 
-        testMethod() {
-            return 'Overridden method called';
-        }
-
-        internalMethod() {
-            return 'Internal method called';
-        }
-
-        traits() {
-            return [
-                'TestTrait',
-            ];
-        }
+export default class TestClassWithTraitOverriddenMethod extends PluginBase {
+    construct() {
+        this.internalProperty = 'Internal property';
+        this.traitProperty = 'Overridden property';
     }
 
-    Snowboard.addPlugin('testClassWithTraitOverriddenMethod', TestClassWithTraitOverriddenMethod);
-})(window.Snowboard);
+    testMethod() {
+        return 'Overridden method called';
+    }
+
+    internalMethod() {
+        return 'Internal method called';
+    }
+
+    traits() {
+        return [
+            'TestTrait',
+        ];
+    }
+}

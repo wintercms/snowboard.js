@@ -1,27 +1,25 @@
-((Snowboard) => {
-    class TestSingletonWithDependency extends Snowboard.Singleton {
-        dependencies() {
-            return ['testDependencyOne'];
-        }
+import Singleton from '../../../src/abstracts/Singleton';
 
-        listens() {
-            return {
-                ready: 'ready',
-            };
-        }
-
-        ready() {
-            return 'Ready';
-        }
-
-        testMethod() {
-            return 'Tested';
-        }
-
-        dependencyTest() {
-            return this.snowboard.testDependencyOne().testMethod();
-        }
+export default class TestSingletonWithDependency extends Singleton {
+    dependencies() {
+        return ['testDependencyOne'];
     }
 
-    Snowboard.addPlugin('testSingleton', TestSingletonWithDependency);
-})(window.Snowboard);
+    listens() {
+        return {
+            ready: 'ready',
+        };
+    }
+
+    ready() {
+        return 'Ready';
+    }
+
+    testMethod() {
+        return 'Tested';
+    }
+
+    dependencyTest() {
+        return this.snowboard.testDependencyOne().testMethod();
+    }
+}

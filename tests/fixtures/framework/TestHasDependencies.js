@@ -1,13 +1,11 @@
-((Snowboard) => {
-    class TestHasDependencies extends Snowboard.Singleton {
-        dependencies() {
-            return ['testDependencyOne', 'testDependencyTwo'];
-        }
+import Singleton from '../../../src/abstracts/Singleton';
 
-        testMethod() {
-            return 'Tested';
-        }
+export default class TestHasDependencies extends Singleton {
+    dependencies() {
+        return ['testDependencyOne', 'testDependencyTwo'];
     }
 
-    Snowboard.addPlugin('testHasDependencies', TestHasDependencies);
-})(window.Snowboard);
+    testMethod() {
+        return 'Tested';
+    }
+}

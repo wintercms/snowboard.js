@@ -1,9 +1,7 @@
-((Snowboard) => {
-    class TestDependencyTwo extends Snowboard.Singleton {
-        testMethod() {
-            return 'Tested';
-        }
-    }
+import Singleton from '../../../src/abstracts/Singleton';
 
-    Snowboard.addPlugin('testDependencyTwo', TestDependencyTwo);
-})(window.Snowboard);
+export default class TestDependencyTwo extends Singleton {
+    testMethod() {
+        return 'Tested';
+    }
+}

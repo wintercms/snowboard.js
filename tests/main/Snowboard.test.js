@@ -1,79 +1,72 @@
-import FakeDom from '../helpers/FakeDom';
+import TestInstance from '../../src/main/Snowboard';
+import ProxyHandler from '../../src/main/ProxyHandler';
+import TestPlugin from '../fixtures/framework/TestPlugin';
+import TestSingleton from '../fixtures/framework/TestSingleton';
+import TestListener from '../fixtures/framework/TestListener';
+import TestClosureListener from '../fixtures/framework/TestClosureListener';
+import TestPromiseListener from '../fixtures/framework/TestPromiseListener';
+import TestPromiseClosureListener from '../fixtures/framework/TestPromiseClosureListener';
+import TestHasDependencies from '../fixtures/framework/TestHasDependencies';
+import TestDependencyOne from '../fixtures/framework/TestDependencyOne';
+import TestDependencyTwo from '../fixtures/framework/TestDependencyTwo';
+import TestSingletonWithDependency from '../fixtures/framework/TestSingletonWithDependency';
+import TestSingletonWithReady from '../fixtures/framework/TestSingletonWithReady';
+import TestTrait from '../fixtures/framework/TestTrait';
 
 describe('Snowboard framework', () => {
-    it('initialises correctly', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.js',
-            ])
-            .render();
-
-        expect(dom.window.Snowboard).toBeDefined();
-        expect(dom.window.Snowboard.addPlugin).toBeDefined();
-        expect(dom.window.Snowboard.addPlugin).toEqual(expect.any(Function));
-
-        // Check PluginBase and Singleton abstracts exist
-        expect(dom.window.Snowboard.PluginBase).toBeDefined();
-        expect(dom.window.Snowboard.Singleton).toBeDefined();
-
-        // Check in-built plugins
-        expect(dom.window.Snowboard.getPluginNames()).toEqual(
-            expect.arrayContaining(['assetloader', 'cookie', 'jsonparser', 'sanitizer', 'url']),
+    beforeEach(() => {
+        window.Snowboard = new Proxy(
+            new TestInstance(),
+            ProxyHandler,
         );
-        expect(dom.window.Snowboard.getPlugin('assetLoader').isFunction()).toEqual(false);
-        expect(dom.window.Snowboard.getPlugin('assetLoader').isSingleton()).toEqual(true);
-        expect(dom.window.Snowboard.getPlugin('cookie').isFunction()).toEqual(false);
-        expect(dom.window.Snowboard.getPlugin('cookie').isSingleton()).toEqual(true);
-        expect(dom.window.Snowboard.getPlugin('jsonparser').isFunction()).toEqual(false);
-        expect(dom.window.Snowboard.getPlugin('jsonparser').isSingleton()).toEqual(true);
-        expect(dom.window.Snowboard.getPlugin('sanitizer').isFunction()).toEqual(false);
-        expect(dom.window.Snowboard.getPlugin('sanitizer').isSingleton()).toEqual(true);
-        expect(dom.window.Snowboard.getPlugin('url').isFunction()).toEqual(false);
-        expect(dom.window.Snowboard.getPlugin('url').isSingleton()).toEqual(true);
     });
 
-    it('is frozen on construction and doesn\'t allow prototype pollution', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestPlugin.js',
-            ])
-            .render();
+    it('initialises correctly', () => {
+        expect(Snowboard).toBeDefined();
+        expect(Snowboard.addPlugin).toBeDefined();
+        expect(Snowboard.addPlugin).toEqual(expect.any(Function));
 
+        // Check PluginBase and Singleton abstracts exist
+        expect(Snowboard.PluginBase).toBeDefined();
+        expect(Snowboard.Singleton).toBeDefined();
+
+        // Check in-built plugins
+        expect(Snowboard.getPluginNames()).toEqual(
+            expect.arrayContaining(['assetloader', 'cookie', 'jsonparser', 'sanitizer', 'url']),
+        );
+        expect(Snowboard.getPlugin('assetLoader').isSingleton()).toEqual(true);
+        expect(Snowboard.getPlugin('cookie').isSingleton()).toEqual(true);
+        expect(Snowboard.getPlugin('jsonparser').isSingleton()).toEqual(true);
+        expect(Snowboard.getPlugin('sanitizer').isSingleton()).toEqual(true);
+        expect(Snowboard.getPlugin('url').isSingleton()).toEqual(true);
+    });
+
+    it('is frozen on construction and doesn\'t allow prototype pollution', () => {
         expect(() => {
-            dom.window.snowboard.newMethod = () => true;
+            Snowboard.newMethod = () => true;
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.newProperty = 'test';
+            Snowboard.newProperty = 'test';
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.readiness.test = 'test';
+            Snowboard.readiness.test = 'test';
         }).toThrow(TypeError);
 
-        expect(dom.window.Snowboard.newMethod).toBeUndefined();
-        expect(dom.window.Snowboard.newProperty).toBeUndefined();
+        expect(Snowboard.newMethod).toBeUndefined();
+        expect(Snowboard.newProperty).toBeUndefined();
 
         // You should not be able to modify the Snowboard object fed to plugins either
-        const instance = dom.window.Snowboard.testPlugin();
+        Snowboard.addPlugin('testPlugin', TestPlugin);
+        const instance = Snowboard.testPlugin();
         expect(() => {
             instance.snowboard.newMethod = () => true;
         }).toThrow(TypeError);
     });
 
-    it('can add and remove a plugin', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestPlugin.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+    it('can add and remove a plugin', () => {
+        Snowboard.addPlugin('testPlugin', TestPlugin);
 
         // Check plugin caller
         expect('testPlugin' in Snowboard).toEqual(true);
@@ -110,22 +103,14 @@ describe('Snowboard framework', () => {
         // Remove plugin
         Snowboard.removePlugin('testPlugin');
         expect(Snowboard.hasPlugin('testPlugin')).toEqual(false);
-        expect(dom.window.Snowboard.getPluginNames()).not.toEqual(
+        expect(Snowboard.getPluginNames()).not.toEqual(
             expect.arrayContaining(['testplugin']),
         );
         expect(Snowboard.testPlugin).not.toBeDefined();
     });
 
-    it('can add and remove a singleton', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestSingleton.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+    it('can add and remove a singleton', () => {
+        Snowboard.addPlugin('testSingleton', TestSingleton);
 
         expect('testPlugin' in Snowboard).toEqual(false);
         expect('testSingleton' in Snowboard).toEqual(true);
@@ -163,36 +148,28 @@ describe('Snowboard framework', () => {
         // Remove plugin
         Snowboard.removePlugin('testSingleton');
         expect(Snowboard.hasPlugin('testSingleton')).toEqual(false);
-        expect(dom.window.Snowboard.getPluginNames()).not.toEqual(
+        expect(Snowboard.getPluginNames()).not.toEqual(
             expect.arrayContaining(['testsingleton']),
         );
         expect(Snowboard.testSingleton).not.toBeDefined();
     });
 
-    it('can listen and call global events', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestListener.js',
-            ])
-            .render();
+    it('can listen and call global events', () => {
+        Snowboard.addPlugin('testListener', TestListener);
 
-        const { Snowboard } = dom.window;
-
-        expect(Snowboard.listensToEvent('eventOne')).toEqual(['test']);
-        expect(Snowboard.listensToEvent('eventTwo')).toEqual(['test']);
+        expect(Snowboard.listensToEvent('eventOne')).toEqual(['testlistener']);
+        expect(Snowboard.listensToEvent('eventTwo')).toEqual(['testlistener']);
         expect(Snowboard.listensToEvent('eventThree')).toEqual([]);
 
         // Call global event one
-        const testClass = Snowboard.test();
+        const testClass = Snowboard.testListener();
         Snowboard.globalEvent('eventOne', 42);
         expect(testClass.eventResult).toEqual('Event called with arg 42');
 
         // Call global event two - should fail as the test plugin doesn't have that method
         expect(() => {
             Snowboard.globalEvent('eventTwo');
-        }).toThrow('Missing "notExists" method in "test" plugin');
+        }).toThrow('Missing "notExists" method in "testlistener" plugin');
 
         // Call global event three - nothing should happen
         expect(() => {
@@ -200,23 +177,15 @@ describe('Snowboard framework', () => {
         }).not.toThrow();
     });
 
-    it('can listen and call global events that are simple closures', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestClosureListener.js',
-            ])
-            .render();
+    it('can listen and call global events that are simple closures', () => {
+        Snowboard.addPlugin('testClosureListener', TestClosureListener);
 
-        const { Snowboard } = dom.window;
-
-        expect(Snowboard.listensToEvent('eventOne')).toEqual(['testclosure']);
-        expect(Snowboard.listensToEvent('eventTwo')).toEqual(['testclosure']);
+        expect(Snowboard.listensToEvent('eventOne')).toEqual(['testclosurelistener']);
+        expect(Snowboard.listensToEvent('eventTwo')).toEqual(['testclosurelistener']);
         expect(Snowboard.listensToEvent('eventThree')).toEqual([]);
 
         // Call global event one
-        const testClass = Snowboard.testClosure();
+        const testClass = Snowboard.testClosureListener();
         Snowboard.globalEvent('eventOne');
         expect(testClass.eventResult).toEqual('Closure eventOne called');
 
@@ -231,15 +200,7 @@ describe('Snowboard framework', () => {
     });
 
     it('can listen and call global promise events', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestPromiseListener.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+        Snowboard.addPlugin('test', TestPromiseListener);
 
         expect(Snowboard.listensToEvent('promiseOne')).toEqual(['test']);
         expect(Snowboard.listensToEvent('promiseTwo')).toEqual(['test']);
@@ -278,15 +239,7 @@ describe('Snowboard framework', () => {
     });
 
     it('can listen and call global promise events that are simple closures', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestPromiseClosureListener.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+        Snowboard.addPlugin('testClosure', TestPromiseClosureListener);
 
         expect(Snowboard.listensToEvent('promiseOne')).toEqual(['testclosure']);
         expect(Snowboard.listensToEvent('promiseTwo')).toEqual(['testclosure']);
@@ -323,51 +276,27 @@ describe('Snowboard framework', () => {
         expect(chain).toEqual(true);
     });
 
-    it('will throw an error when using a plugin that has unfulfilled dependencies', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestHasDependencies.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+    it('will throw an error when using a plugin that has unfulfilled dependencies', () => {
+        Snowboard.addPlugin('testHasDependencies', TestHasDependencies);
 
         expect(() => {
             Snowboard.testHasDependencies();
         }).toThrow('The "testhasdependencies" plugin requires the following plugins: testdependencyone, testdependencytwo');
     });
 
-    it('will throw an error when using a plugin that has some unfulfilled dependencies', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestHasDependencies.js',
-                'tests/fixtures/framework/TestDependencyOne.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+    it('will throw an error when using a plugin that has some unfulfilled dependencies', () => {
+        Snowboard.addPlugin('testHasDependencies', TestHasDependencies);
+        Snowboard.addPlugin('testDependencyOne', TestDependencyOne);
 
         expect(() => {
             Snowboard.testHasDependencies();
         }).toThrow('The "testhasdependencies" plugin requires the following plugins: testdependencytwo');
     });
 
-    it('will not throw an error when using a plugin that has fulfilled dependencies', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestDependencyTwo.js',
-                'tests/fixtures/framework/TestHasDependencies.js',
-                'tests/fixtures/framework/TestDependencyOne.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+    it('will not throw an error when using a plugin that has fulfilled dependencies', () => {
+        Snowboard.addPlugin('testDependencyTwo', TestDependencyTwo);
+        Snowboard.addPlugin('testHasDependencies', TestHasDependencies);
+        Snowboard.addPlugin('testDependencyOne', TestDependencyOne);
 
         expect(() => {
             Snowboard.testHasDependencies();
@@ -376,16 +305,8 @@ describe('Snowboard framework', () => {
         expect(Snowboard.testHasDependencies().testMethod()).toEqual('Tested');
     });
 
-    it('will not initialise a singleton that has unfulfilled dependencies', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestSingletonWithDependency.js',
-            ])
-            .render();
-
-        const { Snowboard } = dom.window;
+    it('will not initialise a singleton that has unfulfilled dependencies', () => {
+        Snowboard.addPlugin('testSingleton', TestSingletonWithDependency);
 
         expect(() => {
             Snowboard.testSingleton();
@@ -398,52 +319,61 @@ describe('Snowboard framework', () => {
         }).not.toThrow();
     });
 
-    it('will allow plugins to call other plugin methods', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-                'tests/fixtures/framework/TestDependencyOne.js',
-                'tests/fixtures/framework/TestSingletonWithDependency.js',
-            ])
-            .render();
+    it('will allow plugins to call other plugin methods', () => {
+        Snowboard.addPlugin('testDependencyOne', TestDependencyOne);
+        Snowboard.addPlugin('testSingleton', TestSingletonWithDependency);
 
-        const { Snowboard } = dom.window;
         const instance = Snowboard.testSingleton();
 
         expect(instance.dependencyTest()).toEqual('Tested');
     });
 
-    it('doesn\'t allow PluginBase or Singleton abstracts to be modified', async () => {
-        const dom = await FakeDom
-            .new()
-            .addScript([
-                'dist/snowboard.min.js',
-            ])
-            .render();
-
+    it('doesn\'t allow PluginBase or Singleton abstracts to be modified', () => {
         expect(() => {
-            dom.window.Snowboard.PluginBase.newMethod = () => true;
+            Snowboard.PluginBase.newMethod = () => true;
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.PluginBase.destruct = () => true;
+            Snowboard.PluginBase.destruct = () => true;
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.PluginBase.prototype.newMethod = () => true;
+            Snowboard.PluginBase.prototype.newMethod = () => true;
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.Singleton.newMethod = () => true;
+            Snowboard.Singleton.newMethod = () => true;
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.Singleton.destruct = () => true;
+            Snowboard.Singleton.destruct = () => true;
         }).toThrow(TypeError);
 
         expect(() => {
-            dom.window.Snowboard.Singleton.prototype.newMethod = () => true;
+            Snowboard.Singleton.prototype.newMethod = () => true;
         }).toThrow(TypeError);
+    });
+
+    it('auto-initializes singletons on DOM ready', () => {
+        Snowboard.addPlugin('testSingleton', TestSingletonWithReady);
+
+        const event = new Event('DOMContentLoaded');
+        window.dispatchEvent(event);
+
+        expect(Snowboard.testSingleton().notReady).toEqual(false);
+    });
+
+    it('won\'t allow two plugins to share the same name', () => {
+        Snowboard.addPlugin('testSingleton', TestSingleton);
+
+        expect(() => {
+            Snowboard.addPlugin('testSingleton', TestSingletonWithReady);
+        }).toThrow('already registered');
+    });
+
+    it('won\'t allow a plugin that does not extend PluginBase or Singleton abstracts', () => {
+        expect(() => {
+            Snowboard.addPlugin('testPlugin', TestTrait);
+        }).toThrow('must extend the PluginBase class');
     });
 });

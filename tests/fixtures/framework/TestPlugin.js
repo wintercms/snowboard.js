@@ -1,9 +1,7 @@
-((Snowboard) => {
-    class TestPlugin extends Snowboard.PluginBase {
-        testMethod() {
-            return 'Tested';
-        }
-    }
+import PluginBase from '../../../src/abstracts/PluginBase';
 
-    Snowboard.addPlugin('testPlugin', TestPlugin);
-})(window.Snowboard);
+export default class TestPlugin extends PluginBase {
+    testMethod() {
+        return 'Tested';
+    }
+}

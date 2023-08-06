@@ -1,38 +1,39 @@
 /* eslint-disable max-classes-per-file */
-((Snowboard) => {
-    class TestClassWithTrait extends Snowboard.PluginBase {
-        construct() {
-            this.internalProperty = 'Internal property';
-        }
+import PluginBase from '../../../src/abstracts/PluginBase';
 
-        internalMethod() {
-            return 'Internal method called';
-        }
-
-        traits() {
-            return [
-                'TestTrait',
-            ];
-        }
+class TestClassWithTrait extends PluginBase {
+    construct() {
+        this.internalProperty = 'Internal property';
     }
 
-    Snowboard.addPlugin('testClassWithTrait', TestClassWithTrait);
-
-    class TestExtensionOfClassWithTrait extends TestClassWithTrait {
-        extendedMethod() {
-            return 'Extension method called';
-        }
-
-        testMethodTwo() {
-            return 'Overridden method called';
-        }
-
-        traits() {
-            return [
-                'TestTraitTwo',
-            ];
-        }
+    internalMethod() {
+        return 'Internal method called';
     }
 
-    Snowboard.addPlugin('testExtensionOfClassWithTrait', TestExtensionOfClassWithTrait);
-})(window.Snowboard);
+    traits() {
+        return [
+            'TestTrait',
+        ];
+    }
+}
+
+class TestExtensionOfClassWithTrait extends TestClassWithTrait {
+    extendedMethod() {
+        return 'Extension method called';
+    }
+
+    testMethodTwo() {
+        return 'Overridden method called';
+    }
+
+    traits() {
+        return [
+            'TestTraitTwo',
+        ];
+    }
+}
+
+export {
+    TestClassWithTrait,
+    TestExtensionOfClassWithTrait,
+};

@@ -1,16 +1,14 @@
-((Snowboard) => {
-    class TestListener extends Snowboard.Singleton {
-        listens() {
-            return {
-                eventOne: 'eventOne',
-                eventTwo: 'notExists',
-            };
-        }
+import Singleton from '../../../src/abstracts/Singleton';
 
-        eventOne(arg) {
-            this.eventResult = `Event called with arg ${arg}`;
-        }
+export default class TestListener extends Singleton {
+    listens() {
+        return {
+            eventOne: 'eventOne',
+            eventTwo: 'notExists',
+        };
     }
 
-    Snowboard.addPlugin('test', TestListener);
-})(window.Snowboard);
+    eventOne(arg) {
+        this.eventResult = `Event called with arg ${arg}`;
+    }
+}
