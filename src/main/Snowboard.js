@@ -392,66 +392,66 @@ export default class Snowboard {
     globalEvent(eventName, ...parameters) {
         this.debug(`Calling global event "${eventName}"`, ...parameters);
 
+        let cancelled = false;
+
         // Find plugins listening to the event.
         const listeners = this.listensToEvent(eventName);
         if (listeners.length === 0) {
             this.debug(`No listeners found for global event "${eventName}"`);
-            return true;
-        }
-        this.debug(`Listeners found for global event "${eventName}": ${listeners.join(', ')}`);
+        } else {
+            this.debug(`Listeners found for global event "${eventName}": ${listeners.join(', ')}`);
 
-        let cancelled = false;
+            listeners.forEach((name) => {
+                const plugin = this.getPlugin(name);
 
-        listeners.forEach((name) => {
-            const plugin = this.getPlugin(name);
-
-            if (plugin.isSingleton() && plugin.getInstances().length === 0) {
-                plugin.initialiseSingleton();
-            }
-
-            const listenMethod = plugin.callMethod('listens')[eventName];
-
-            // Call event handler methods for all plugins, if they have a method specified for the
-            // event.
-            plugin.getInstances().forEach((instance) => {
-                // If a plugin has cancelled the event, no further plugins are considered.
-                if (cancelled) {
-                    return;
+                if (plugin.isSingleton() && plugin.getInstances().length === 0) {
+                    plugin.initialiseSingleton();
                 }
 
-                if (typeof listenMethod === 'function') {
-                    try {
-                        const result = listenMethod.apply(instance, parameters);
-                        if (result === false) {
-                            cancelled = true;
-                        }
-                    } catch (error) {
-                        this.error(
-                            `Error thrown in "${eventName}" event by "${name}" plugin.`,
-                            error,
-                        );
-                    }
-                } else if (typeof listenMethod === 'string') {
-                    if (!instance[listenMethod]) {
-                        throw new Error(`Missing "${listenMethod}" method in "${name}" plugin`);
+                const listenMethod = plugin.callMethod('listens')[eventName];
+
+                // Call event handler methods for all plugins, if they have a method specified for
+                // the event.
+                plugin.getInstances().forEach((instance) => {
+                    // If a plugin has cancelled the event, no further plugins are considered.
+                    if (cancelled) {
+                        return;
                     }
 
-                    try {
-                        if (instance[listenMethod](...parameters) === false) {
-                            cancelled = true;
-                            this.debug(`Global event "${eventName}" cancelled by "${name}" plugin`);
+                    if (typeof listenMethod === 'function') {
+                        try {
+                            const result = listenMethod.apply(instance, parameters);
+                            if (result === false) {
+                                cancelled = true;
+                            }
+                        } catch (error) {
+                            this.error(
+                                `Error thrown in "${eventName}" event by "${name}" plugin.`,
+                                error,
+                            );
                         }
-                    } catch (error) {
-                        this.error(
-                            `Error thrown in "${eventName}" event by "${name}" plugin.`,
-                            error,
-                        );
+                    } else if (typeof listenMethod === 'string') {
+                        if (!instance[listenMethod]) {
+                            throw new Error(`Missing "${listenMethod}" method in "${name}" plugin`);
+                        }
+
+                        try {
+                            if (instance[listenMethod](...parameters) === false) {
+                                cancelled = true;
+                                this.debug(`Global event "${eventName}" cancelled by "${name}" plugin`);
+                            }
+                        } catch (error) {
+                            this.error(
+                                `Error thrown in "${eventName}" event by "${name}" plugin.`,
+                                error,
+                            );
+                        }
+                    } else {
+                        this.error(`Listen method for "${eventName}" event in "${name}" plugin is not a function or string.`);
                     }
-                } else {
-                    this.error(`Listen method for "${eventName}" event in "${name}" plugin is not a function or string.`);
-                }
+                });
             });
-        });
+        }
 
         // Find ad-hoc listeners for this event.
         if (!cancelled && this.listeners[eventName] && this.listeners[eventName].length > 0) {
@@ -493,67 +493,67 @@ export default class Snowboard {
     globalPromiseEvent(eventName, ...parameters) {
         this.debug(`Calling global promise event "${eventName}"`);
 
+        const promises = [];
+
         // Find plugins listening to this event.
         const listeners = this.listensToEvent(eventName);
         if (listeners.length === 0) {
             this.debug(`No listeners found for global promise event "${eventName}"`);
-            return Promise.resolve();
-        }
-        this.debug(`Listeners found for global promise event "${eventName}": ${listeners.join(', ')}`);
+        } else {
+            this.debug(`Listeners found for global promise event "${eventName}": ${listeners.join(', ')}`);
 
-        const promises = [];
+            listeners.forEach((name) => {
+                const plugin = this.getPlugin(name);
 
-        listeners.forEach((name) => {
-            const plugin = this.getPlugin(name);
-
-            if (plugin.isSingleton() && plugin.getInstances().length === 0) {
-                plugin.initialiseSingleton();
-            }
-
-            const listenMethod = plugin.callMethod('listens')[eventName];
-
-            // Call event handler methods for all plugins, if they have a method specified for the
-            // event.
-            plugin.getInstances().forEach((instance) => {
-                if (typeof listenMethod === 'function') {
-                    try {
-                        const instancePromise = listenMethod.apply(instance, parameters);
-
-                        if (instancePromise instanceof Promise === false) {
-                            return;
-                        }
-
-                        promises.push(instancePromise);
-                    } catch (error) {
-                        this.error(
-                            `Error thrown in "${eventName}" event by "${name}" plugin.`,
-                            error,
-                        );
-                    }
-                } else if (typeof listenMethod === 'string') {
-                    if (!instance[listenMethod]) {
-                        throw new Error(`Missing "${listenMethod}" method in "${name}" plugin`);
-                    }
-
-                    try {
-                        const instancePromise = instance[listenMethod](...parameters);
-
-                        if (instancePromise instanceof Promise === false) {
-                            return;
-                        }
-
-                        promises.push(instancePromise);
-                    } catch (error) {
-                        this.error(
-                            `Error thrown in "${eventName}" promise event by "${name}" plugin.`,
-                            error,
-                        );
-                    }
-                } else {
-                    this.error(`Listen method for "${eventName}" event in "${name}" plugin is not a function or string.`);
+                if (plugin.isSingleton() && plugin.getInstances().length === 0) {
+                    plugin.initialiseSingleton();
                 }
+
+                const listenMethod = plugin.callMethod('listens')[eventName];
+
+                // Call event handler methods for all plugins, if they have a method specified for
+                // the event.
+                plugin.getInstances().forEach((instance) => {
+                    if (typeof listenMethod === 'function') {
+                        try {
+                            const instancePromise = listenMethod.apply(instance, parameters);
+
+                            if (instancePromise instanceof Promise === false) {
+                                return;
+                            }
+
+                            promises.push(instancePromise);
+                        } catch (error) {
+                            this.error(
+                                `Error thrown in "${eventName}" event by "${name}" plugin.`,
+                                error,
+                            );
+                        }
+                    } else if (typeof listenMethod === 'string') {
+                        if (!instance[listenMethod]) {
+                            throw new Error(`Missing "${listenMethod}" method in "${name}" plugin`);
+                        }
+
+                        try {
+                            const instancePromise = instance[listenMethod](...parameters);
+
+                            if (instancePromise instanceof Promise === false) {
+                                return;
+                            }
+
+                            promises.push(instancePromise);
+                        } catch (error) {
+                            this.error(
+                                `Error thrown in "${eventName}" promise event by "${name}" plugin.`,
+                                error,
+                            );
+                        }
+                    } else {
+                        this.error(`Listen method for "${eventName}" event in "${name}" plugin is not a function or string.`);
+                    }
+                });
             });
-        });
+        }
 
         // Find ad-hoc listeners listening to this event.
         if (this.listeners[eventName] && this.listeners[eventName].length > 0) {

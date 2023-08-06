@@ -65,22 +65,34 @@ export default class AssetLoader extends Singleton {
     load(assets) {
         const promises = [];
 
-        if (assets.js && assets.js.length > 0) {
-            assets.js.forEach((script) => {
-                promises.push(this.loadScript(script));
-            });
+        if (assets.js) {
+            if (typeof assets.js === 'string') {
+                promises.push(this.loadScript(assets.js));
+            } else if (Array.isArray(assets.js) && assets.js.length > 0) {
+                assets.js.forEach((script) => {
+                    promises.push(this.loadScript(script));
+                });
+            }
         }
 
-        if (assets.css && assets.css.length > 0) {
-            assets.css.forEach((style) => {
-                promises.push(this.loadStyle(style));
-            });
+        if (assets.css) {
+            if (typeof assets.css === 'string') {
+                promises.push(this.loadStyle(assets.css));
+            } else if (Array.isArray(assets.css) && assets.css.length > 0) {
+                assets.css.forEach((style) => {
+                    promises.push(this.loadStyle(style));
+                });
+            }
         }
 
-        if (assets.img && assets.img.length > 0) {
-            assets.img.forEach((image) => {
-                promises.push(this.loadImage(image));
-            });
+        if (assets.img) {
+            if (typeof assets.img === 'string') {
+                promises.push(this.loadImage(assets.img));
+            } else if (Array.isArray(assets.img) && assets.img.length > 0) {
+                assets.img.forEach((image) => {
+                    promises.push(this.loadImage(image));
+                });
+            }
         }
 
         return Promise.all(promises);

@@ -15,6 +15,9 @@ import TestTrait from '../fixtures/framework/TestTrait';
 
 describe('Snowboard framework', () => {
     beforeEach(() => {
+        document.currentScript.dataset.baseUrl = 'https://example.com';
+        document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
+
         window.Snowboard = new Proxy(
             new TestInstance(),
             ProxyHandler,

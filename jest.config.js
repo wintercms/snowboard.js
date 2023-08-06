@@ -3,6 +3,8 @@
  * https://jestjs.io/docs/configuration
  */
 
+const JestResourceLoader = require('./tests/jestResourceLoader');
+
 /** @type {import('jest').Config} */
 const config = {
     // All imported modules in your tests should be mocked automatically
@@ -134,7 +136,9 @@ const config = {
     // runner: "jest-runner",
 
     // The paths to modules that run some code to configure or set up the testing environment before each test
-    // setupFiles: [],
+    setupFiles: [
+        '<rootDir>/tests/jestSetup.js',
+    ],
 
     // A list of paths to modules that run some code to configure or set up the testing framework before each test
     // setupFilesAfterEnv: [],
@@ -149,7 +153,10 @@ const config = {
     testEnvironment: "jsdom",
 
     // Options that will be passed to the testEnvironment
-    // testEnvironmentOptions: {},
+    testEnvironmentOptions: {
+        resources: new JestResourceLoader(),
+        runScripts: 'dangerously',
+    },
 
     // Adds a location field to test results
     // testLocationInResults: false,

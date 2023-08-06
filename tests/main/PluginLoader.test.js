@@ -5,6 +5,9 @@ import TestSingleton from '../fixtures/framework/TestSingleton';
 
 describe('PluginLoader class', () => {
     beforeEach(() => {
+        document.currentScript.dataset.baseUrl = 'https://example.com';
+        document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
+
         window.Snowboard = new Proxy(
             new TestInstance(),
             ProxyHandler,

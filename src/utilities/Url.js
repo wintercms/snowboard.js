@@ -65,12 +65,30 @@ export default class Url extends Singleton {
     }
 
     /**
+     * Sets the base URL on the fly.
+     *
+     * @returns {string}
+     */
+    setBaseUrl(url) {
+        this.foundBaseUrl = this.validateBaseUrl(url);
+    }
+
+    /**
      * Gets the asset URL.
      *
      * @returns {string}
      */
     assetUrl() {
         return this.foundAssetUrl;
+    }
+
+    /**
+     * Sets the asset URL on the fly.
+     *
+     * @returns {string}
+     */
+    setAssetUrl(url) {
+        this.foundAssetUrl = this.validateBaseUrl(url);
     }
 
     /**
@@ -89,22 +107,30 @@ export default class Url extends Singleton {
      * @returns {string}
      */
     determineUrls() {
-        if (document.currentScript && document.currentScript.dataset.baseUrl !== null) {
+        if (document.currentScript && document.currentScript.dataset.baseUrl) {
             this.foundBaseUrl = this.validateBaseUrl(document.currentScript.dataset.baseUrl);
         }
-        if (document.currentScript && document.currentScript.dataset.assetUrl !== null) {
+        if (document.currentScript && document.currentScript.dataset.assetUrl) {
             this.foundAssetUrl = this.validateBaseUrl(document.currentScript.dataset.assetUrl);
         }
 
-        if (document.querySelector('base') !== null) {
-            this.foundBaseUrl = this.validateBaseUrl(
-                document.querySelector('base').getAttribute('href'),
-            );
-            this.foundAssetUrl = this.foundBaseUrl;
+        if (document.querySelector('base')) {
+            if (!this.foundBaseUrl) {
+                this.foundBaseUrl = this.validateBaseUrl(
+                    document.querySelector('base').getAttribute('href'),
+                );
+            }
+            if (!this.foundAssetUrl) {
+                this.foundAssetUrl = this.foundBaseUrl;
+            }
         }
 
-        this.foundBaseUrl = window.location.origin;
-        this.foundAssetUrl = this.foundBaseUrl;
+        if (!this.foundBaseUrl) {
+            this.foundBaseUrl = this.validateBaseUrl(window.location.origin);
+        }
+        if (!this.foundAssetUrl) {
+            this.foundAssetUrl = this.foundBaseUrl;
+        }
     }
 
     /**
@@ -129,7 +155,7 @@ export default class Url extends Singleton {
             throw new Error('Invalid base URL detected');
         }
 
-        return (url.substring(-1) === '/')
+        return (url.endsWith('/'))
             ? url
             : `${url}/`;
     }
