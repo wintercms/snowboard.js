@@ -338,4 +338,112 @@ describe('Snowboard framework', () => {
             Snowboard.testHasDependencies();
         }).toThrow('The "testhasdependencies" plugin requires the following plugins: testdependencyone, testdependencytwo');
     });
+
+    it('will throw an error when using a plugin that has some unfulfilled dependencies', async () => {
+        const dom = await FakeDom
+            .new()
+            .addScript([
+                'dist/snowboard.min.js',
+                'tests/fixtures/framework/TestHasDependencies.js',
+                'tests/fixtures/framework/TestDependencyOne.js',
+            ])
+            .render();
+
+        const { Snowboard } = dom.window;
+
+        expect(() => {
+            Snowboard.testHasDependencies();
+        }).toThrow('The "testhasdependencies" plugin requires the following plugins: testdependencytwo');
+    });
+
+    it('will not throw an error when using a plugin that has fulfilled dependencies', async () => {
+        const dom = await FakeDom
+            .new()
+            .addScript([
+                'dist/snowboard.min.js',
+                'tests/fixtures/framework/TestDependencyTwo.js',
+                'tests/fixtures/framework/TestHasDependencies.js',
+                'tests/fixtures/framework/TestDependencyOne.js',
+            ])
+            .render();
+
+        const { Snowboard } = dom.window;
+
+        expect(() => {
+            Snowboard.testHasDependencies();
+        }).not.toThrow();
+
+        expect(Snowboard.testHasDependencies().testMethod()).toEqual('Tested');
+    });
+
+    it('will not initialise a singleton that has unfulfilled dependencies', async () => {
+        const dom = await FakeDom
+            .new()
+            .addScript([
+                'dist/snowboard.min.js',
+                'tests/fixtures/framework/TestSingletonWithDependency.js',
+            ])
+            .render();
+
+        const { Snowboard } = dom.window;
+
+        expect(() => {
+            Snowboard.testSingleton();
+        }).toThrow('The "testsingleton" plugin requires the following plugins: testdependencyone');
+
+        expect(Snowboard.listensToEvent('ready')).not.toContain('testsingleton');
+
+        expect(() => {
+            Snowboard.globalEvent('ready');
+        }).not.toThrow();
+    });
+
+    it('will allow plugins to call other plugin methods', async () => {
+        const dom = await FakeDom
+            .new()
+            .addScript([
+                'dist/snowboard.min.js',
+                'tests/fixtures/framework/TestDependencyOne.js',
+                'tests/fixtures/framework/TestSingletonWithDependency.js',
+            ])
+            .render();
+
+        const { Snowboard } = dom.window;
+        const instance = Snowboard.testSingleton();
+
+        expect(instance.dependencyTest()).toEqual('Tested');
+    });
+
+    it('doesn\'t allow PluginBase or Singleton abstracts to be modified', async () => {
+        const dom = await FakeDom
+            .new()
+            .addScript([
+                'dist/snowboard.min.js',
+            ])
+            .render();
+
+        expect(() => {
+            dom.window.Snowboard.PluginBase.newMethod = () => true;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            dom.window.Snowboard.PluginBase.destruct = () => true;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            dom.window.Snowboard.PluginBase.prototype.newMethod = () => true;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            dom.window.Snowboard.Singleton.newMethod = () => true;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            dom.window.Snowboard.Singleton.destruct = () => true;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            dom.window.Snowboard.Singleton.prototype.newMethod = () => true;
+        }).toThrow(TypeError);
+    });
 });
