@@ -24,6 +24,7 @@
     "ignorePatterns": [
         "rollup.config.mjs",
         "jest.config.js",
+        "tests/*.js",
         "dist/"
     ],
     "overrides": [
