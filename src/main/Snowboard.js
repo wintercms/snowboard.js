@@ -131,7 +131,7 @@ export default class Snowboard {
      * `Snowboard.myplugin()`.
      *
      * @param {string} name
-     * @param {PluginBase|Function} instance
+     * @param {PluginBase} instance
      */
     addPlugin(name, instance) {
         const lowerName = name.toLowerCase();
@@ -140,8 +140,8 @@ export default class Snowboard {
             throw new Error(`A plugin called "${name}" is already registered.`);
         }
 
-        if (typeof instance !== 'function' && instance instanceof PluginBase === false) {
-            throw new Error('The provided plugin must extend the PluginBase class, or must be a callback function.');
+        if (instance.prototype instanceof PluginBase === false) {
+            throw new Error('The provided plugin must extend the PluginBase class');
         }
 
         if (this[name] !== undefined || this[lowerName] !== undefined) {
@@ -312,9 +312,6 @@ export default class Snowboard {
         Object.entries(this.plugins).forEach((entry) => {
             const [name, plugin] = entry;
 
-            if (plugin.isFunction()) {
-                return;
-            }
             if (!plugin.dependenciesFulfilled()) {
                 return;
             }
@@ -411,9 +408,6 @@ export default class Snowboard {
         listeners.forEach((name) => {
             const plugin = this.getPlugin(name);
 
-            if (plugin.isFunction()) {
-                return;
-            }
             if (plugin.isSingleton() && plugin.getInstances().length === 0) {
                 plugin.initialiseSingleton();
             }
@@ -515,9 +509,6 @@ export default class Snowboard {
         listeners.forEach((name) => {
             const plugin = this.getPlugin(name);
 
-            if (plugin.isFunction()) {
-                return;
-            }
             if (plugin.isSingleton() && plugin.getInstances().length === 0) {
                 plugin.initialiseSingleton();
             }

@@ -57,10 +57,6 @@ export default class PluginLoader {
      * @returns {boolean}
      */
     hasMethod(methodName) {
-        if (this.isFunction()) {
-            return false;
-        }
-
         return (typeof this.instance.prototype[methodName] === 'function');
     }
 
@@ -72,10 +68,6 @@ export default class PluginLoader {
      * @returns {any}
      */
     callMethod(...parameters) {
-        if (this.isFunction()) {
-            return null;
-        }
-
         const args = parameters;
         const methodName = args.shift();
 
@@ -91,9 +83,6 @@ export default class PluginLoader {
      * @returns {PluginBase|Function}
      */
     getInstance(...parameters) {
-        if (this.isFunction()) {
-            return this.instance(...parameters);
-        }
         if (!this.dependenciesFulfilled()) {
             const unmet = this.getDependencies().filter(
                 (item) => !this.snowboard.getPluginNames().includes(item),
@@ -149,20 +138,7 @@ export default class PluginLoader {
      * @returns {PluginBase[]}
      */
     getInstances() {
-        if (this.isFunction()) {
-            return [];
-        }
-
         return this.instances;
-    }
-
-    /**
-     * Determines if the current plugin is a simple callback function.
-     *
-     * @returns {boolean}
-     */
-    isFunction() {
-        return (typeof this.instance === 'function' && this.instance.prototype instanceof PluginBase === false);
     }
 
     /**
@@ -214,16 +190,6 @@ export default class PluginLoader {
      * @returns {string[]}
      */
     getDependencies() {
-        // Callback functions cannot have dependencies.
-        if (this.isFunction()) {
-            return [];
-        }
-
-        // No dependency method specified.
-        if (typeof this.instance.prototype.dependencies !== 'function') {
-            return [];
-        }
-
         return this.instance.prototype.dependencies().map((item) => item.toLowerCase());
     }
 
@@ -257,10 +223,6 @@ export default class PluginLoader {
      * @param {Function} callback
      */
     mock(methodName, callback) {
-        if (this.isFunction()) {
-            return;
-        }
-
         if (!this.instance.prototype[methodName]) {
             throw new Error(`Function "${methodName}" does not exist and cannot be mocked`);
         }
@@ -282,9 +244,6 @@ export default class PluginLoader {
      * @param {string} methodName
      */
     unmock(methodName) {
-        if (this.isFunction()) {
-            return;
-        }
         if (!this.mocks[methodName]) {
             return;
         }
