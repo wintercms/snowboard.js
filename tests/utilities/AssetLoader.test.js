@@ -26,7 +26,7 @@ describe('AssetLoader utility', () => {
             });
         });
 
-        const promise = Snowboard.assetLoader.load({
+        const promise = Snowboard.assetLoader().load({
             js: '/test.js',
         });
 
@@ -62,7 +62,7 @@ describe('AssetLoader utility', () => {
             });
         });
 
-        const promise = Snowboard.assetLoader.load({
+        const promise = Snowboard.assetLoader().load({
             js: [
                 '/test.js',
                 'http://example.io/test2.js',

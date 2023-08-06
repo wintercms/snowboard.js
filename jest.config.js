@@ -3,8 +3,6 @@
  * https://jestjs.io/docs/configuration
  */
 
-const JestResourceLoader = require('./tests/jestResourceLoader');
-
 /** @type {import('jest').Config} */
 const config = {
     // All imported modules in your tests should be mocked automatically
@@ -150,11 +148,10 @@ const config = {
     // snapshotSerializers: [],
 
     // The test environment that will be used for testing
-    testEnvironment: "jsdom",
+    testEnvironment: "./tests/jestEnvironment",
 
     // Options that will be passed to the testEnvironment
     testEnvironmentOptions: {
-        resources: new JestResourceLoader(),
         runScripts: 'dangerously',
     },
 

@@ -4,7 +4,7 @@ export default {
             const propLower = prop.toLowerCase();
 
             if (target.hasPlugin(propLower)) {
-                return Reflect.get(target, 'plugins')[propLower].getInstance();
+                return (...params) => Reflect.get(target, 'plugins')[propLower].getInstance(...params);
             }
         }
 
