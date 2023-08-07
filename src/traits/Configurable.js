@@ -1,5 +1,3 @@
-import PluginBase from '../abstracts/PluginBase';
-
 /**
  * Data configuration provider.
  *
@@ -21,15 +19,27 @@ export default class Configurable {
     /**
      * Instance constructor.
      */
-    construct() {
-        if (this instanceof PluginBase === false) {
-            throw new Error('Configurable trait can only be attached to Snowboard plugins.');
-        }
+    construct(options) {
         if (this.element instanceof HTMLElement === false) {
             throw new Error('Data configuration can only be extracted from HTML elements');
         }
 
-        this.refresh();
+        // Lock acceptAllDataConfigs to prevent it from being changed externally
+        Object.defineProperty(this, 'acceptAllDataConfigs', {
+            enumerable: true,
+            writable: false,
+            configurable: false,
+            value: (options.acceptAllDataConfigs || false),
+        });
+
+        this.refreshConfig();
+    }
+
+    /**
+     * Provide empty defaults in the plugin instance does not contain a `defaults()` method.
+     */
+    defaults() {
+        return {};
     }
 
     /**
@@ -39,7 +49,7 @@ export default class Configurable {
      *
      * @param {string} config
      */
-    get(config) {
+    getConfig(config) {
         if (config === undefined) {
             return this.instanceConfig;
         }
@@ -60,7 +70,7 @@ export default class Configurable {
      * @param {any} value
      * @param {boolean} persist
      */
-    set(config, value, persist) {
+    setConfig(config, value, persist) {
         if (config === undefined) {
             throw new Error('You must provide a configuration key to set');
         }
@@ -69,7 +79,6 @@ export default class Configurable {
 
         if (persist === true) {
             this.element.dataset[config] = value;
-            this.localConfig[config] = value;
         }
     }
 
@@ -79,7 +88,7 @@ export default class Configurable {
      * This will allow you to make changes to the data config on a DOM level and re-apply them
      * to the config on the JavaScript side.
      */
-    refresh() {
+    refreshConfig() {
         this.acceptedConfigs = this.getAcceptedConfigs();
         this.instanceConfig = this.processConfig();
     }
@@ -104,11 +113,7 @@ export default class Configurable {
             return true;
         }
 
-        if (
-            this.defaults !== undefined
-            && typeof this.defaults === 'function'
-            && typeof this.defaults() === 'object'
-        ) {
+        if (typeof this.defaults() === 'object') {
             return Object.keys(this.defaults());
         }
 
@@ -123,12 +128,8 @@ export default class Configurable {
      *
      * @returns {object}
      */
-    getDefaults() {
-        if (
-            this.defaults !== undefined
-            && typeof this.defaults === 'function'
-            && typeof this.defaults() === 'object'
-        ) {
+    getDefaultConfig() {
+        if (typeof this.defaults() === 'object') {
             return this.defaults();
         }
 
@@ -146,7 +147,7 @@ export default class Configurable {
      * @returns {object}
      */
     processConfig() {
-        const config = this.getDefaults();
+        const config = this.getDefaultConfig();
 
         if (this.acceptedConfigs === false) {
             return config;
@@ -155,13 +156,7 @@ export default class Configurable {
         /* eslint-disable */
         for (const key in this.element.dataset) {
             if (this.acceptedConfigs === true || this.acceptedConfigs.includes(key)) {
-                config[key] = this.coerceValue(this.element.dataset[key], config[key]);
-            }
-        }
-
-        for (const key in this.localConfig) {
-            if (this.acceptedConfigs === true || this.acceptedConfigs.includes(key)) {
-                config[key] = this.localConfig[key];
+                config[key] = this.coerceConfigValue(this.element.dataset[key], config[key]);
             }
         }
         /* eslint-enable */
@@ -179,7 +174,7 @@ export default class Configurable {
      * @param {*} defaultValue
      * @returns {*}
      */
-    coerceValue(value, defaultValue) {
+    coerceConfigValue(value, defaultValue) {
         const stringValue = String(value);
 
         // Null value
@@ -196,7 +191,7 @@ export default class Configurable {
         if (stringValue.startsWith('base64:')) {
             const base64str = stringValue.replace(/^base64:/, '');
             const decoded = atob(base64str);
-            return this.coerceValue(decoded);
+            return this.coerceConfigValue(decoded);
         }
 
         // Boolean value

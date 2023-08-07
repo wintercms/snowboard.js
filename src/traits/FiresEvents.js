@@ -1,5 +1,3 @@
-import PluginBase from '../abstracts/PluginBase';
-
 /**
  * Widget event handler.
  *
@@ -25,9 +23,6 @@ export default class FiresEvents {
      * Instance constructor.
      */
     construct() {
-        if (this instanceof PluginBase === false) {
-            throw new Error('Event handling can only be applied to Snowboard classes.');
-        }
         if (!this.eventPrefix) {
             throw new Error('Event prefix is required.');
         }

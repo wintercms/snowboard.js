@@ -1,15 +1,11 @@
 import TestInstance from '../../src/main/Snowboard';
-import ProxyHandler from '../../src/main/ProxyHandler';
 
 describe('Url utility', () => {
     it('can get base and asset URLs from data attributes on current script', () => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
 
         expect(Snowboard.url().baseUrl()).toBe('https://example.com/');
         expect(Snowboard.url().assetUrl()).toBe('https://example.com/assets/');
@@ -23,10 +19,7 @@ describe('Url utility', () => {
         base.setAttribute('href', 'https://example.com');
         document.head.appendChild(base);
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
 
         expect(Snowboard.url().baseUrl()).toBe('https://example.com/');
         expect(Snowboard.url().assetUrl()).toBe('https://example.com/');
@@ -35,10 +28,7 @@ describe('Url utility', () => {
     it('can get base and asset URLs from the location origin as a last resort', () => {
         document.querySelector('base').remove();
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
 
         expect(Snowboard.url().baseUrl()).toBe('http://localhost/');
         expect(Snowboard.url().assetUrl()).toBe('http://localhost/');
@@ -48,10 +38,7 @@ describe('Url utility', () => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
 
         expect(Snowboard.url().to('/something')).toBe('https://example.com/something');
         expect(Snowboard.url().to('something/else')).toBe('https://example.com/something/else');
@@ -63,10 +50,7 @@ describe('Url utility', () => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
 
         expect(Snowboard.url().to('https://wintercms.com')).toBe('https://wintercms.com');
         expect(Snowboard.url().to('https://wintercms.com/something')).toBe('https://wintercms.com/something');

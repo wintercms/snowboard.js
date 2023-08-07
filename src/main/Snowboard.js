@@ -302,6 +302,21 @@ export default class Snowboard {
     }
 
     /**
+     * Returns the prototype of the given trait.
+     *
+     * @returns {Object}
+     */
+    getTrait(name) {
+        if (!this.hasTrait(name)) {
+            throw new Error(`No trait called "${name}" has been registered.`);
+        }
+
+        const lowerName = name.toLowerCase();
+
+        return this.traits[lowerName];
+    }
+
+    /**
      * Finds all plugins that listen to the given event.
      *
      * This works for both normal and promise events. It does NOT check that the plugin's listener

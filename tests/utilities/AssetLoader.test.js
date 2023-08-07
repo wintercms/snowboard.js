@@ -1,15 +1,11 @@
 import TestInstance from '../../src/main/Snowboard';
-import ProxyHandler from '../../src/main/ProxyHandler';
 
 describe('AssetLoader utility', () => {
     beforeEach(() => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/fixtures/assets/';
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
     });
 
     it('can load a script', async () => {

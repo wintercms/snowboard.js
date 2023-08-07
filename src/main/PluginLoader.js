@@ -292,7 +292,21 @@ export default class PluginLoader {
                             return;
                         }
 
-                        traits.push(trait);
+                        traits.push({
+                            trait,
+                            config: {},
+                        });
+                    });
+                } else if (typeof currentTraits === 'object') {
+                    Object.entries(currentTraits).forEach(([trait, config]) => {
+                        if (traits.includes(trait)) {
+                            return;
+                        }
+
+                        traits.push({
+                            trait,
+                            config,
+                        });
                     });
                 }
             }
@@ -301,8 +315,14 @@ export default class PluginLoader {
         }
 
         // Apply traits (inspired by https://calebporzio.com/equivalent-of-php-class-traits-in-javascript)
-        traits.forEach((Trait) => {
-            const traitInstance = new Trait();
+        traits.forEach((trait) => {
+            if (this.snowboard.hasTrait(trait.trait) === false) {
+                this.warning(`Trait "${trait.trait}" does not exist and cannot be applied to "${this.name}"`);
+                return;
+            }
+
+            const TraitInstance = this.snowboard.getTrait(trait.trait);
+            const traitInstance = new TraitInstance();
 
             // Get defined properties in trait constructor.
             const descriptors = Object.keys(traitInstance).reduce((innerDescriptors, key) => {
@@ -311,12 +331,15 @@ export default class PluginLoader {
             }, {});
 
             // Get methods defined in trait prototype.
-            Object.getOwnPropertyNames(Trait.prototype).forEach((propertyName) => {
-                if (propertyName === 'constructor') {
+            Object.getOwnPropertyNames(TraitInstance.prototype).forEach((propertyName) => {
+                if (['constructor', 'construct', 'destruct', 'destructor'].includes(propertyName)) {
                     return;
                 }
 
-                const descriptor = Object.getOwnPropertyDescriptor(Trait.prototype, propertyName);
+                const descriptor = Object.getOwnPropertyDescriptor(
+                    TraitInstance.prototype,
+                    propertyName,
+                );
                 descriptors[propertyName] = descriptor;
             });
 
@@ -330,6 +353,11 @@ export default class PluginLoader {
 
             // Apply new descriptors to instance.
             Object.defineProperties(instance, newDescriptors);
+
+            // If the trait has a "construct" method, apply this to the instance.
+            if (traitInstance.construct) {
+                traitInstance.construct.call(instance, trait.config);
+            }
         });
     }
 }

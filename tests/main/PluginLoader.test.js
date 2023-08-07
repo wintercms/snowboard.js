@@ -1,5 +1,4 @@
 import TestInstance from '../../src/main/Snowboard';
-import ProxyHandler from '../../src/main/ProxyHandler';
 import TestPlugin from '../fixtures/framework/TestPlugin';
 import TestSingleton from '../fixtures/framework/TestSingleton';
 
@@ -8,10 +7,7 @@ describe('PluginLoader class', () => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
 
-        window.Snowboard = new Proxy(
-            new TestInstance(),
-            ProxyHandler,
-        );
+        window.Snowboard = new TestInstance();
     });
 
     it('can mock plugin methods', () => {
