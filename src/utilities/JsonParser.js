@@ -15,7 +15,14 @@ import Singleton from '../abstracts/Singleton';
  */
 export default class JsonParser extends Singleton {
     parse(str) {
-        const jsonString = this.parseString(str);
+        let jsonString;
+
+        try {
+            jsonString = this.parseString(str);
+        } catch (e) {
+            return str;
+        }
+
         return JSON.parse(jsonString);
     }
 
@@ -94,7 +101,7 @@ export default class JsonParser extends Singleton {
         /*
         * object
         */
-        if (str[0] === '{') {
+        if (str[0] === '{' || (this.canBeKeyHead(str[0]) && str.indexOf(':') !== -1)) {
             type = 'needKey';
             key = null;
             result = '{';
