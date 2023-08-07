@@ -1,3 +1,4 @@
+import ProxyHandler from './ProxyHandler';
 import PluginBase from '../abstracts/PluginBase';
 import Singleton from '../abstracts/Singleton';
 import PluginLoader from './PluginLoader';
@@ -52,6 +53,9 @@ export default class Snowboard {
         this.initialise();
 
         this.debug('Snowboard framework initialised');
+
+        /* eslint-disable no-constructor-return */
+        return new Proxy(this, ProxyHandler);
     }
 
     /**

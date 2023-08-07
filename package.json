@@ -2,14 +2,28 @@
   "name": "@wintercms/snowboard",
   "version": "0.1.0",
   "description": "The Winter CMS Snowboard.js framework as a standalone module",
-  "browser": "src/browser.js",
+  "keywords": [
+    "winter",
+    "wintercms",
+    "snowboard",
+    "framework",
+    "organization",
+    "management"
+  ],
+  "main": "dist/snowboard.esm.js",
+  "browser": "dist/snowboard.min.js",
   "scripts": {
-    "build": "rollup -c",
-    "watch": "rollup -c -w",
+    "build": "npm run build:esm && npm run build:browser",
+    "build:browser": "rollup -c rollup.browser.config.mjs",
+    "build:esm": "rollup -c rollup.esm.config.mjs",
+    "watch": "rollup -c rollup.esm.config.js -w",
     "lint": "eslint --ext .js src tests",
     "test": "jest"
   },
   "author": "Ben Thomson <git@alfreido.com>",
+  "homepage": "https://wintercms.com",
+  "repository": "github:wintercms/snowboard.js",
+  "bugs": "https://github.com/wintercms/snowboard.js/issues",
   "license": "MIT",
   "dependencies": {
     "js-cookie": "^3.0.5"
@@ -30,5 +44,12 @@
     "jest": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",
     "rollup": "^3.27.2"
+  },
+  "files": [
+    "dist/*.js"
+  ],
+  "engines": {
+    "node": ">=14.18.0",
+    "npm": ">=8.0.0"
   }
 }
