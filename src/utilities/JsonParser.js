@@ -89,23 +89,26 @@ export default class JsonParser extends Singleton {
      * @returns {string}
      */
     tokenize(str, tokens) {
-        const tokenized = str.trim().replace(/('[^']+'|"[^"]+"|\{.*?\}\s*(?=[,{\]]|$)|\[.*\](?=[,{\]]|$))/g, (match) => {
-            if (match.substring(0, 1) === '\'' || match.substring(0, 1) === '"') {
-                tokens.strings.push(match);
+        const tokenized = str.trim().replace(/('[^']+'|"[^"]+"|\{.*?\}\s*(?=[,{\]]|$)|\[.*\]\s*(?=[,{\]]|$))/gs, (match) => {
+            const trimmed = match.trim();
+
+            if (trimmed.substring(0, 1) === '\'' || trimmed.substring(0, 1) === '"') {
+                tokens.strings.push(trimmed);
                 return `__STR$(${(tokens.strings.length - 1)})__`;
             }
 
-            if (match.substring(0, 1) === '{') {
-                const obj = this.tokenize(match.substring(1, match.length - 1), tokens);
+            if (trimmed.substring(0, 1) === '{') {
+                const obj = this.tokenize(trimmed.substring(1, trimmed.length - 1), tokens);
                 tokens.objects.push(obj);
                 return `__OBJ$(${(tokens.objects.length - 1)})__`;
             }
 
-            const obj = this.tokenize(match.substring(1, match.length - 1), tokens);
+            const obj = this.tokenize(trimmed.substring(1, trimmed.length - 1), tokens);
             tokens.arrays.push(obj);
             return `__ARR$(${(tokens.arrays.length - 1)})__`;
         });
 
+        // Work out key/pair values for objects, or values for arrays, and tokenise these too.
         let pairs = [];
 
         if (tokenized.includes(',')) {
@@ -158,14 +161,14 @@ export default class JsonParser extends Singleton {
         return tokenized.replace(/__([A-Z]{3})\$\((\d+)\)__/g, (match, tokenCode, tokenIndex) => {
             switch (tokenCode) {
                 case 'STR':
-                    return tokens.strings[tokenIndex];
+                    return tokens.strings[tokenIndex].replace(/\n/g, '\\n');
                 case 'KEY':
                     return `"${tokens.keys[tokenIndex]}"`;
                 case 'VAL':
                     try {
-                        return JSON5.parse(tokens.values[tokenIndex]);
+                        return JSON5.parse(tokens.values[tokenIndex].replace(/\n/g, '\\n'));
                     } catch (e) {
-                        return `"${tokens.values[tokenIndex]}"`;
+                        return `"${tokens.values[tokenIndex].replace(/\n/g, '\\n')}"`;
                     }
                 case 'ARR':
                     return `[ ${this.detokenize(tokens.arrays[tokenIndex], tokens)} ]`;

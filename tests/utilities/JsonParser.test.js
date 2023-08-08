@@ -32,6 +32,7 @@ describe('JsonParser utility', () => {
         expect(Snowboard.jsonParser().parse('"null"')).toEqual('null');
         expect(Snowboard.jsonParser().parse('\'1.23\'')).toEqual('1.23');
         expect(Snowboard.jsonParser().parse('\'test\'')).toEqual('test');
+        expect(Snowboard.jsonParser().parse('1.2.3')).toEqual('1.2.3');
     });
 
     it('parses a string that looks like an object', () => {
@@ -69,10 +70,7 @@ describe('JsonParser utility', () => {
     });
 
     it('can parse a complex object with multiple layers', () => {
-        const parsed = Snowboard.jsonParser().parse('celebs: { tom: { holland: true, "cruise": false, "others": [ hardy, "hanks" ] } }, movies: [ { movie: "The Avengers" , stars : 4 }, { movie: "Mission: Impossible", stars: 4 } ]');
-        console.log(parsed);
-
-        expect(parsed).toEqual({
+        expect(Snowboard.jsonParser().parse('celebs: { tom: { holland: true, "cruise": false, "others": [ hardy, "hanks" ] } }, movies: [ { movie: "The Avengers" , stars : 4 }, { movie: "Mission: Impossible", stars: 4 } ]')).toEqual({
             celebs: {
                 tom: {
                     holland: true,
@@ -90,6 +88,43 @@ describe('JsonParser utility', () => {
                 },
                 {
                     movie: 'Mission: Impossible',
+                    stars: 4,
+                },
+            ],
+        });
+    });
+
+    it('can parse an object over multiple lines', () => {
+        expect(Snowboard.jsonParser().parse(`celebs: {
+             tom:
+                { holland: true, "cruise": false,
+                "others": [ hardy, "hanks" ] }
+            }
+            , movies: [
+                { movie: "The Avengers" , stars : 4 },
+                { movie:
+                    "Mission:
+                    Impossible",
+                stars:
+                 4 }
+            ]`)).toEqual({
+            celebs: {
+                tom: {
+                    holland: true,
+                    cruise: false,
+                    others: [
+                        'hardy',
+                        'hanks',
+                    ],
+                },
+            },
+            movies: [
+                {
+                    movie: 'The Avengers',
+                    stars: 4,
+                },
+                {
+                    movie: 'Mission:\n                    Impossible',
                     stars: 4,
                 },
             ],
