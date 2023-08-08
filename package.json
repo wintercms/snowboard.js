@@ -26,7 +26,8 @@
   "bugs": "https://github.com/wintercms/snowboard.js/issues",
   "license": "MIT",
   "dependencies": {
-    "js-cookie": "^3.0.5"
+    "js-cookie": "^3.0.5",
+    "json5": "^2.2.3"
   },
   "devDependencies": {
     "@babel/core": "^7.22.9",
