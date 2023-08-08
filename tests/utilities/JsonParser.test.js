@@ -35,7 +35,7 @@ describe('JsonParser utility', () => {
     });
 
     it('parses a string that looks like an object', () => {
-        expect(Snowboard.jsonParser().parse('first: "second"')).toEqual({
+        expect(Snowboard.jsonParser().parse('first: second')).toEqual({
             first: 'second',
         });
         expect(Snowboard.jsonParser().parse('firstName: "Ben", surname: \'Thomson\'')).toEqual({
@@ -45,7 +45,7 @@ describe('JsonParser utility', () => {
     });
 
     it('parses an actual object', () => {
-        expect(Snowboard.jsonParser().parse('{ first: "second" }')).toEqual({
+        expect(Snowboard.jsonParser().parse('{ first: second }')).toEqual({
             first: 'second',
         });
         expect(Snowboard.jsonParser().parse('{ \'firstName\': "Ben", "surname": \'Thomson\' }')).toEqual({
@@ -55,7 +55,7 @@ describe('JsonParser utility', () => {
     });
 
     it('parses a string that looks like an array', () => {
-        expect(Snowboard.jsonParser().parse('\'winter\', \'is\', \'cool\'')).toEqual([
+        expect(Snowboard.jsonParser().parse('winter, is, cool')).toEqual([
             'winter',
             'is',
             'cool',
@@ -66,5 +66,33 @@ describe('JsonParser utility', () => {
             'number',
             1,
         ]);
+    });
+
+    it('can parse a complex object with multiple layers', () => {
+        const parsed = Snowboard.jsonParser().parse('celebs: { tom: { holland: true, "cruise": false, "others": [ hardy, "hanks" ] } }, movies: [ { movie: "The Avengers" , stars : 4 }, { movie: "Mission: Impossible", stars: 4 } ]');
+        console.log(parsed);
+
+        expect(parsed).toEqual({
+            celebs: {
+                tom: {
+                    holland: true,
+                    cruise: false,
+                    others: [
+                        'hardy',
+                        'hanks',
+                    ],
+                },
+            },
+            movies: [
+                {
+                    movie: 'The Avengers',
+                    stars: 4,
+                },
+                {
+                    movie: 'Mission: Impossible',
+                    stars: 4,
+                },
+            ],
+        });
     });
 });
