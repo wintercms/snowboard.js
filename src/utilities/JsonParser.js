@@ -1,5 +1,5 @@
-import Singleton from '../abstracts/Singleton';
 import JSON5 from 'json5';
+import Singleton from '../abstracts/Singleton';
 
 /**
  * JSON Parser utility.
