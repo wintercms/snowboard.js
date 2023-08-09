@@ -65,7 +65,9 @@ describe('PluginLoader class', () => {
         Snowboard.addPlugin('testPlugin', TestPlugin);
         Snowboard.addPlugin('testSingleton', TestSingleton);
 
-        const rootInstance = Snowboard.getPlugin('testPlugin').instance;
+        const loader = Snowboard.getPlugin('testPlugin');
+        const rootInstance = loader.instance;
+        expect(loader.isInitialised()).toBe(true);
 
         expect(() => {
             rootInstance.newMethod = () => true;
@@ -101,5 +103,26 @@ describe('PluginLoader class', () => {
         const loadedSingletonTwo = Snowboard.getPlugin('testSingleton').getInstance();
         expect(loadedSingletonTwo.newMethod).toEqual(expect.any(Function));
         expect(loadedSingletonTwo.newMethod()).toBe(true);
+    });
+
+    it('should not allow some Snowboard methods to be used within a plugin', () => {
+        Snowboard.addPlugin('testPlugin', TestPlugin);
+
+        const instance = Snowboard.testPlugin();
+
+        expect('initialiseSingletons' in instance.snowboard).toBe(false);
+        expect(() => {
+            instance.snowboard.initialiseSingletons();
+        }).toThrow('You cannot use the "initialiseSingletons" Snowboard method within a plugin');
+    });
+
+    it('can detect other plugins and methods within Snowboard instance passed through to plugin', () => {
+        Snowboard.addPlugin('testPlugin', TestPlugin);
+        Snowboard.addPlugin('testSingleton', TestSingleton);
+
+        const instance = Snowboard.testPlugin();
+
+        expect('testSingleton' in instance.snowboard).toBe(true);
+        expect('globalEvent' in instance.snowboard).toBe(true);
     });
 });
