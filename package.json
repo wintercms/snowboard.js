@@ -1,6 +1,6 @@
 {
   "name": "@wintercms/snowboard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The Winter CMS Snowboard.js framework as a standalone module",
   "keywords": [
     "winter",
@@ -19,7 +19,8 @@
     "watch": "rollup -c rollup.esm.config.js -w",
     "lint": "eslint --ext .js src tests",
     "test": "jest",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "prepublish": "npm run build"
   },
   "author": "Ben Thomson <git@alfreido.com>",
   "homepage": "https://wintercms.com",
