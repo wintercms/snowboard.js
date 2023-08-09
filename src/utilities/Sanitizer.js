@@ -8,29 +8,37 @@ import Singleton from '../abstracts/Singleton';
  * as attributes, i.e. `onload` or `onerror`) or contain the `javascript:` pseudo protocol in their
  * values.
  *
+ * This is only a simple sanitizer and does not attempt to be exhaustive. If you're truly paranoid
+ * about the input, you might want to consider a more robust sanitizer like
+ * [DOMPurify](https://github.com/cure53/DOMPurify).
+ *
  * @author Ben Thomson <git@alfreido.com>
  */
 export default class Sanitizer extends Singleton {
-    construct() {
-        // Add to global function for backwards compatibility
-        window.wnSanitize = (html) => this.sanitize(html);
-        window.ocSanitize = window.wnSanitize;
-    }
-
-    sanitize(html, bodyOnly) {
+    /**
+     * Sanitizes a HTML string.
+     *
+     * @param {string} html
+     * @param {boolean} bodyOnly
+     * @returns {string}
+     */
+    sanitize(html, bodyOnly = true) {
         const parser = new DOMParser();
         const dom = parser.parseFromString(html, 'text/html');
-        const returnBodyOnly = (bodyOnly !== undefined && typeof bodyOnly === 'boolean')
-            ? bodyOnly
-            : true;
 
         this.sanitizeNode(dom.getRootNode());
 
-        return (returnBodyOnly) ? dom.body.innerHTML : dom.innerHTML;
+        return (bodyOnly) ? dom.body.innerHTML : dom.documentElement.outerHTML;
     }
 
+    /**
+     * Sanitizes an individual node.
+     *
+     * @param {Node} node
+     * @returns {void}
+     */
     sanitizeNode(node) {
-        if (node.tagName === 'SCRIPT') {
+        if (['SCRIPT', 'IFRAME', 'OBJECT'].includes(node.tagName)) {
             node.remove();
             return;
         }
@@ -44,6 +52,12 @@ export default class Sanitizer extends Singleton {
         });
     }
 
+    /**
+     * Sanitizes the attributes of a node.
+     *
+     * @param {Node} node
+     * @returns {void}
+     */
     trimAttributes(node) {
         if (!node.attributes) {
             return;
