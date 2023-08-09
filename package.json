@@ -20,7 +20,7 @@
     "lint": "eslint --ext .js src tests",
     "test": "jest",
     "prepare": "husky install",
-    "prepublish": "npm run build"
+    "prepublishOnly": "npm run build"
   },
   "author": "Ben Thomson <git@alfreido.com>",
   "homepage": "https://wintercms.com",
