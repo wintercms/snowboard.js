@@ -215,7 +215,7 @@ export default class Configurable {
 
         // JSON value
         try {
-            return this.snowboard.jsonParser().parse(stringValue);
+            return this.snowboard.jsonParser().parse(stringValue, true);
         } catch (e) {
             return (stringValue === '') ? true : stringValue;
         }

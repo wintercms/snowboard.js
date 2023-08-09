@@ -267,7 +267,7 @@ describe('The Configurable trait', () => {
             data-number-bool-false="0"
             data-null-value="null"
             data-undefined-value="undefined"
-            data-json-value="name: 'Ben Thomson', url: 'https://wintercms.com'"
+            data-json-value="{ name: 'Ben Thomson', url: 'https://wintercms.com' }"
             data-extra-attr="This should not be available"
             data-base64="base64:SSdtIGEgQmFzZTY0LWRlY29kZWQgc3RyaW5n"
         ></div>`;
