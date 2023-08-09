@@ -1,6 +1,6 @@
 {
   "name": "@wintercms/snowboard",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "The Winter CMS Snowboard.js framework as a standalone module",
   "keywords": [
     "winter",
