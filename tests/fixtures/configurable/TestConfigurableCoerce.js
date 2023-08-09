@@ -21,6 +21,7 @@ export default class TestConfigurableCoerce extends PluginBase {
             boolean: null,
             base64: null,
             jsonValue: null,
+            message: null,
         };
     }
 }

@@ -268,6 +268,7 @@ describe('The Configurable trait', () => {
             data-null-value="null"
             data-undefined-value="undefined"
             data-json-value="{ name: 'Ben Thomson', url: 'https://wintercms.com' }"
+            data-message="Error: You have encountered an error, please try again"
             data-extra-attr="This should not be available"
             data-base64="base64:SSdtIGEgQmFzZTY0LWRlY29kZWQgc3RyaW5n"
         ></div>`;
@@ -282,10 +283,14 @@ describe('The Configurable trait', () => {
         expect(instance.getConfig('numberBoolFalse')).toBe(false);
         expect(instance.getConfig('nullValue')).toBeNull();
         expect(instance.getConfig('undefinedValue')).toBeUndefined();
+        // Tests a JSON object that passes the JSON parser's strict mode
         expect(instance.getConfig('jsonValue')).toMatchObject({
             name: 'Ben Thomson',
             url: 'https://wintercms.com',
         });
+        // Tests a string that would be interpreted as an object/array in the JSON parser without
+        // strict mode
+        expect(instance.getConfig('message')).toBe('Error: You have encountered an error, please try again');
         expect(instance.getConfig('extraAttr')).toBeUndefined();
         expect(instance.getConfig('base64')).toBe('I\'m a Base64-decoded string');
     });
