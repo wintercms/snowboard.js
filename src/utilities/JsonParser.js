@@ -26,12 +26,17 @@ export default class JsonParser extends Singleton {
      *
      * First, it attempts to parse the string through JSON5 parser, a more "relaxed" JSON parser
      * which is still semantically JavaScript. If this fails, it will tokenize the string and
-     * catch some
+     * catch some more common issues and fix them before attempting to run through the JSON5 parser
+     * again.
+     *
+     * If `strict` is true, it will not try and correct any missing object or array boundaries on
+     * the root element, and will instead assume a string has been given from the outset.
      *
      * @param {string} str
+     * @param {boolean} strict
      * @returns {any}
      */
-    parse(str) {
+    parse(str, strict = false) {
         // Handle special cases
         if (str === 'undefined') {
             return undefined;
@@ -42,7 +47,7 @@ export default class JsonParser extends Singleton {
             return JSON5.parse(str);
         } catch (e) {
             // Try to prepare string and then parse again
-            const jsonString = this.prepareString(String(str));
+            const jsonString = this.prepareString(String(str), strict);
 
             return JSON5.parse(jsonString);
         }
@@ -52,9 +57,10 @@ export default class JsonParser extends Singleton {
      * Prepares a string for a second-pass at parsing.
      *
      * @param {string} str
+     * @param {boolean} strict
      * @returns {string}
      */
-    prepareString(str) {
+    prepareString(str, strict) {
         // Tokenize the string before we process further
         const tokens = {
             keys: [],
@@ -67,10 +73,10 @@ export default class JsonParser extends Singleton {
         const tokenized = this.tokenize(str, tokens).trim();
 
         // After tokenization, determine if we have an object, an array or a string
-        if (tokenized.includes(':')) {
+        if (tokenized.includes(':') && !strict) {
             return `{ ${this.detokenize(tokenized, tokens)} }`;
         }
-        if (tokenized.includes(',')) {
+        if (tokenized.includes(',') && !strict) {
             return `[ ${this.detokenize(tokenized, tokens)} ]`;
         }
         if (tokenized.match(/^__[A-Z]{3}\$\(\d+\)__$/)) {
@@ -78,7 +84,7 @@ export default class JsonParser extends Singleton {
         }
 
         // Assume we're dealing with a string
-        return `"${str}"`;
+        return `"${str.replace(/"/g, '\\"').replace(/\n/g, '\\n')}"`;
     }
 
     /**
