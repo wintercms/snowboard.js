@@ -45,6 +45,6 @@ describe('Sanitizer utility', () => {
 
         const output = Snowboard.sanitizer().sanitize(html, false).replace(/\s+/g, ' ');
 
-        expect(output).toEqual('<html><head> <title>Hi</title> </head> <body> <div> <p>We\'re cool. </p> <a></a> <img src=\"myimage.png\"> </div> </body></html>');
+        expect(output).toEqual('<html><head> <title>Hi</title> </head> <body> <div> <p>We\'re cool. </p> <a></a> <img src="myimage.png"> </div> </body></html>');
     });
 });
