@@ -12,9 +12,10 @@ import Singleton from '../abstracts/Singleton';
  *   a string. ie: `foo` will be considered `"foo"`.
  * - A string that is not quoted but contains a colon and is not wrapped with object boundaries,
  *   will be considered an object. ie: `foo: bar, baz: buzz` will be considered `"{"foo": "bar",
- *   "baz": "buzz"}"`.
+ *   "baz": "buzz"}"`. (Only in non-strict mode)
  * - A string that is not quoted but contains a comma and is not wrapped with array boundaries,
  *   will be considered an array. ie: `foo, bar, baz` will be considered `["foo", "bar", "baz"]`.
+ *   (Only in non-strict mode)
  * - Keys and values inside of objects and arrays will be parsed as strings unless they match a
  *   specific syntax.
  *
