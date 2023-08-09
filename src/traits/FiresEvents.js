@@ -17,14 +17,15 @@ export default class FiresEvents {
      */
     constructor() {
         this.events = [];
+        this.localEventsOnly = false;
     }
 
     /**
      * Instance constructor.
      */
     construct() {
-        if (!this.eventPrefix) {
-            throw new Error('Event prefix is required.');
+        if (!this.localEventsOnly && !this.eventPrefix) {
+            throw new Error('Event prefix is required if global events are enabled.');
         }
     }
 
@@ -71,16 +72,21 @@ export default class FiresEvents {
     }
 
     /**
-     * Fires an event on the widget.
+     * Triggers an event on the widget.
      *
-     * Local events are fired first, then a global event is fired afterwards.
+     * Local events are triggered first, then a global event is sent afterwards.
      *
      * @param {String} eventName
      * @param  {...any} parameters
      */
-    fire(eventName, ...parameters) {
+    triggerEvent(eventName, ...parameters) {
         // Fire local events first
         const events = this.events.filter((registeredEvent) => registeredEvent.event === eventName);
+
+        if (events.length === 0) {
+            return;
+        }
+
         let cancelled = false;
         events.forEach((event) => {
             if (cancelled) {
@@ -91,7 +97,7 @@ export default class FiresEvents {
             }
         });
 
-        if (!cancelled) {
+        if (!cancelled && !this.localEventsOnly) {
             this.snowboard.globalEvent(`${this.eventPrefix}.${eventName}`, ...parameters);
         }
     }
@@ -99,13 +105,18 @@ export default class FiresEvents {
     /**
      * Fires a promise event on the widget.
      *
-     * Local events are fired first, then a global event is fired afterwards.
+     * Local events are triggered first, then a global promise event is sent afterwards.
      *
      * @param {String} eventName
      * @param  {...any} parameters
      */
-    firePromise(eventName, ...parameters) {
+    triggerPromiseEvent(eventName, ...parameters) {
         const events = this.events.filter((registeredEvent) => registeredEvent.event === eventName);
+
+        if (events.length === 0) {
+            return;
+        }
+
         const promises = events.filter(
             (event) => event !== null,
             events.map((event) => event.callback(...parameters)),
@@ -113,8 +124,11 @@ export default class FiresEvents {
 
         Promise.all(promises).then(
             () => {
-                this.snowboard.globalPromiseEvent(`${this.eventPrefix}.${eventName}`, ...parameters);
+                if (!this.localEventsOnly) {
+                    this.snowboard.globalPromiseEvent(`${this.eventPrefix}.${eventName}`, ...parameters);
+                }
             },
+            () => {},
         );
     }
 }
