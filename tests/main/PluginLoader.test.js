@@ -10,7 +10,7 @@ describe('PluginLoader class', () => {
         window.Snowboard = new TestInstance();
     });
 
-    it('can mock plugin methods', () => {
+    it('can mock existing methods on a singleton', () => {
         Snowboard.getPlugin('sanitizer').mock('sanitize', () => 'all good');
 
         expect(
@@ -23,6 +23,23 @@ describe('PluginLoader class', () => {
         expect(
             Snowboard.sanitizer().sanitize('<p onload="derp;"></p>'),
         ).toEqual('<p></p>');
+    });
+
+    it('can mock existing methods on all future instances of a plugin', () => {
+        Snowboard.addPlugin('testPlugin', TestPlugin);
+
+        const before = Snowboard.testPlugin();
+
+        expect('testMethod' in before).toBe(true);
+        expect(before.testMethod()).toEqual('Tested');
+
+        Snowboard.getPlugin('testPlugin').mock('testMethod', (instance, withArg) => ({ str: `Mocked ${withArg}`, thisInstance: instance }));
+
+        const after = Snowboard.testPlugin();
+
+        expect('testMethod' in after).toBe(true);
+        expect(after.testMethod('with arg').str).toBe('Mocked with arg');
+        expect(after.testMethod('with arg').thisInstance).toBeInstanceOf(TestPlugin);
     });
 
     it('is frozen on construction and doesn\'t allow prototype pollution', () => {

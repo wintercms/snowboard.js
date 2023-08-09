@@ -76,10 +76,9 @@ export default class PluginLoader {
     /**
      * Returns an instance of the current plugin.
      *
-     * - If this is a callback function plugin, the function will be returned.
-     * - If this is a singleton, the single instance of the plugin will be returned.
+     * If this is a singleton, the single instance of the plugin will be returned.
      *
-     * @returns {PluginBase|Function}
+     * @returns {PluginBase}
      */
     getInstance(...parameters) {
         if (!this.dependenciesFulfilled()) {
@@ -93,7 +92,7 @@ export default class PluginLoader {
                 this.initialiseSingleton(...parameters);
             }
 
-            // Apply mocked methods
+            // Apply mocked methods to singleton instance
             if (Object.keys(this.mocks).length > 0) {
                 Object.entries(this.originalFunctions).forEach((entry) => {
                     const [methodName, callback] = entry;
@@ -101,26 +100,30 @@ export default class PluginLoader {
                 });
                 Object.entries(this.mocks).forEach((entry) => {
                     const [methodName, callback] = entry;
-                    this.instances[0][methodName] = (...params) => callback(this, ...params);
+                    this.instances[0][methodName] = (...params) => callback(
+                        this.instances[0],
+                        ...params,
+                    );
                 });
             }
 
             return this.instances[0];
         }
 
-        // Apply mocked methods to prototype
+        const newInstance = new this.instance(this.snowboard, ...parameters);
+
+        // Apply mocked methods to instance
         if (Object.keys(this.mocks).length > 0) {
             Object.entries(this.originalFunctions).forEach((entry) => {
                 const [methodName, callback] = entry;
-                this.instance.prototype[methodName] = callback;
+                newInstance[methodName] = callback;
             });
             Object.entries(this.mocks).forEach((entry) => {
                 const [methodName, callback] = entry;
-                this.instance.prototype[methodName] = (...params) => callback(this, ...params);
+                newInstance[methodName] = (...params) => callback(newInstance, ...params);
             });
         }
 
-        const newInstance = new this.instance(this.snowboard, ...parameters);
         newInstance.detach = () => this.instances.splice(this.instances.indexOf(newInstance), 1);
         newInstance.construct(...parameters);
         this.loadTraits(newInstance);
@@ -131,8 +134,6 @@ export default class PluginLoader {
 
     /**
      * Gets all instances of the current plugin.
-     *
-     * If this plugin is a callback function plugin, an empty array will be returned.
      *
      * @returns {PluginBase[]}
      */
@@ -214,9 +215,8 @@ export default class PluginLoader {
      * Allows a method of an instance to be mocked for testing.
      *
      * This mock will be applied for the life of an instance. For singletons, the mock will be
-     * applied for the life of the page.
-     *
-     * Mocks cannot be applied to callback function plugins.
+     * applied immediately. For normal plugins, the mock will be applied on any instances created
+     * after the mock is applied.
      *
      * @param {string} methodName
      * @param {Function} callback
