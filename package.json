@@ -18,7 +18,8 @@
     "build:esm": "rollup -c rollup.esm.config.mjs",
     "watch": "rollup -c rollup.esm.config.js -w",
     "lint": "eslint --ext .js src tests",
-    "test": "jest"
+    "test": "jest",
+    "prepare": "husky install"
   },
   "author": "Ben Thomson <git@alfreido.com>",
   "homepage": "https://wintercms.com",
@@ -42,6 +43,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.28.0",
     "eslint-plugin-jest": "^27.2.3",
+    "husky": "^8.0.3",
     "jest": "^29.6.2",
     "jest-environment-jsdom": "^29.6.2",
     "rollup": "^3.27.2"
