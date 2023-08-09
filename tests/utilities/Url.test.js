@@ -30,8 +30,8 @@ describe('Url utility', () => {
 
         window.Snowboard = new TestInstance();
 
-        expect(Snowboard.url().baseUrl()).toBe('http://localhost/');
-        expect(Snowboard.url().assetUrl()).toBe('http://localhost/');
+        expect(Snowboard.url().baseUrl()).toBe('https://example.com/');
+        expect(Snowboard.url().assetUrl()).toBe('https://example.com/');
     });
 
     it('can prepend the base on a relative URL using to()/asset()', () => {

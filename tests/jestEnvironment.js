@@ -2,6 +2,7 @@
 
 const { default: JSDOMEnvironment } = require('jest-environment-jsdom');
 const jestResourceLoader = require('./jestResourceLoader');
+const jestVirtualConsole = require('./jestVirtualConsole');
 
 module.exports = class JSDOMEnvironmentWithResources extends JSDOMEnvironment {
     constructor(config, options) {
@@ -13,6 +14,7 @@ module.exports = class JSDOMEnvironmentWithResources extends JSDOMEnvironment {
               testEnvironmentOptions: {
                 ...config.projectConfig.testEnvironmentOptions,
                 resources: new jestResourceLoader(),
+                virtualConsole: jestVirtualConsole,
               },
             },
           },
