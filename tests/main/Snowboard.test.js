@@ -153,6 +153,24 @@ describe('Snowboard framework', () => {
         expect(Snowboard.testSingleton).not.toBeDefined();
     });
 
+    it('cannot get or remove a plugin that hasn\'t been added', () => {
+        expect(() => {
+            Snowboard.getPlugin('notExists');
+        }).toThrow('No plugin called "notexists" has been registered');
+
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        const SnowboardDebug = new TestInstance(true);
+        SnowboardDebug.removePlugin('notExists');
+
+        expect(groupCollapsedSpy).toHaveBeenCalled();
+        expect(groupCollapsedSpy).toHaveBeenLastCalledWith('%c[Snowboard]', 'color: rgb(45, 167, 199); font-weight: normal;', 'Plugin "notExists" already removed');
+        expect(traceSpy).toHaveBeenCalled();
+        expect(groupEndSpy).toHaveBeenCalled();
+    });
+
     it('can listen and call global events', () => {
         Snowboard.addPlugin('testListener', TestListener);
 
@@ -392,5 +410,104 @@ describe('Snowboard framework', () => {
         expect(() => {
             Snowboard.addPlugin('listensToEvent', TestPlugin);
         }).toThrow('already in use');
+    });
+
+    it('can log messages', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        Snowboard.log('Test message');
+
+        expect(groupCollapsedSpy).toHaveBeenCalledTimes(1);
+        expect(groupCollapsedSpy).toHaveBeenCalledWith('%c[Snowboard]', 'color: rgb(45, 167, 199); font-weight: normal;', 'Test message');
+        expect(traceSpy).toHaveBeenCalledTimes(1);
+        expect(groupEndSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('can log debug messages when debug mode is on', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        const SnowboardDebug = new TestInstance(true);
+
+        SnowboardDebug.debug('Test message');
+
+        expect(groupCollapsedSpy).toHaveBeenCalled();
+        expect(groupCollapsedSpy).toHaveBeenLastCalledWith('%c[Snowboard]', 'color: rgb(45, 167, 199); font-weight: normal;', 'Test message');
+        expect(traceSpy).toHaveBeenCalled();
+        expect(groupEndSpy).toHaveBeenCalled();
+    });
+
+    it('won\'t log debug messages when debug mode is off', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        Snowboard.debug('Test message');
+
+        expect(groupCollapsedSpy).not.toHaveBeenCalled();
+        expect(traceSpy).not.toHaveBeenCalled();
+        expect(groupEndSpy).not.toHaveBeenCalled();
+    });
+
+    it('can log warning messages when debug mode is on', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        const SnowboardDebug = new TestInstance(true);
+
+        SnowboardDebug.warning('Test message');
+
+        expect(groupCollapsedSpy).toHaveBeenCalled();
+        expect(groupCollapsedSpy).toHaveBeenLastCalledWith('%c[Snowboard]', 'color: rgb(229, 179, 71); font-weight: bold;', 'Test message');
+        expect(traceSpy).toHaveBeenCalled();
+        expect(groupEndSpy).toHaveBeenCalled();
+    });
+
+    it('won\'t log warning messages when debug mode is off', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        Snowboard.warning('Test message');
+
+        expect(groupCollapsedSpy).not.toHaveBeenCalled();
+        expect(traceSpy).not.toHaveBeenCalled();
+        expect(groupEndSpy).not.toHaveBeenCalled();
+    });
+
+    it('can log error messages', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        Snowboard.error('Test message');
+
+        expect(groupCollapsedSpy).toHaveBeenCalled();
+        expect(groupCollapsedSpy).toHaveBeenLastCalledWith('%c[Snowboard]', 'color: rgb(211, 71, 71); font-weight: bold;', 'Test message');
+        expect(traceSpy).toHaveBeenCalled();
+        expect(groupEndSpy).toHaveBeenCalled();
+    });
+
+    it('can log multiple parameters', () => {
+        const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
+        const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
+        const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
+        const groupEndSpy = jest.spyOn(console, 'groupEnd').mockImplementation(() => {});
+
+        Snowboard.error('Test message', true, 1);
+
+        expect(groupCollapsedSpy).toHaveBeenCalledTimes(3);
+        expect(logSpy).toHaveBeenCalledTimes(2);
+        expect(groupCollapsedSpy).toHaveBeenNthCalledWith(1, '%c[Snowboard]', 'color: rgb(211, 71, 71); font-weight: bold;', 'Test message');
+        expect(groupCollapsedSpy).toHaveBeenNthCalledWith(2, '%cParameters %c(2)', 'color: rgb(45, 167, 199); font-weight: bold;', 'color: rgb(88, 88, 88); font-weight: normal;');
+        expect(logSpy).toHaveBeenNthCalledWith(1, '%c1:', 'color: rgb(88, 88, 88); font-weight: normal;', true);
+        expect(logSpy).toHaveBeenNthCalledWith(2, '%c2:', 'color: rgb(88, 88, 88); font-weight: normal;', 1);
+        expect(groupCollapsedSpy).toHaveBeenNthCalledWith(3, '%cTrace', 'color: rgb(45, 167, 199); font-weight: bold;');
+        expect(traceSpy).toHaveBeenCalled();
+        expect(groupEndSpy).toHaveBeenCalled();
     });
 });
