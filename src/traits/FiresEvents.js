@@ -16,7 +16,7 @@ export default class FiresEvents {
      * Trait constructor and definition.
      */
     constructor() {
-        this.events = [];
+        this.eventListeners = [];
         this.localEventsOnly = false;
     }
 
@@ -36,7 +36,7 @@ export default class FiresEvents {
      * @param {Function} callback
      */
     on(event, callback) {
-        this.events.push({
+        this.eventListeners.push({
             event,
             callback,
         });
@@ -49,7 +49,7 @@ export default class FiresEvents {
      * @param {Function} callback
      */
     off(event, callback) {
-        this.events = this.events.filter(
+        this.eventListeners = this.eventListeners.filter(
             (registeredEvent) => registeredEvent.event !== event
                 || registeredEvent.callback !== callback,
         );
@@ -62,11 +62,11 @@ export default class FiresEvents {
      * @param {Function} callback
      */
     once(event, callback) {
-        const length = this.events.push({
+        const length = this.eventListeners.push({
             event,
             callback: (...parameters) => {
                 callback(...parameters);
-                this.events.splice(length - 1, 1);
+                this.eventListeners.splice(length - 1, 1);
             },
         });
     }
@@ -81,7 +81,9 @@ export default class FiresEvents {
      */
     triggerEvent(eventName, ...parameters) {
         // Fire local events first
-        const events = this.events.filter((registeredEvent) => registeredEvent.event === eventName);
+        const events = this.eventListeners.filter(
+            (registeredEvent) => registeredEvent.event === eventName,
+        );
 
         if (events.length === 0) {
             return;
@@ -111,7 +113,9 @@ export default class FiresEvents {
      * @param  {...any} parameters
      */
     triggerPromiseEvent(eventName, ...parameters) {
-        const events = this.events.filter((registeredEvent) => registeredEvent.event === eventName);
+        const events = this.eventListeners.filter(
+            (registeredEvent) => registeredEvent.event === eventName,
+        );
 
         if (events.length === 0) {
             return;
