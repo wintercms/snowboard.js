@@ -64,6 +64,20 @@ describe('Snowboard framework', () => {
         }).toThrow(TypeError);
     });
 
+    it('doesn\'t allow core Snowboard properties and methods to be deleted', () => {
+        expect(() => {
+            delete Snowboard.plugins;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            delete Snowboard.addPlugin;
+        }).toThrow(TypeError);
+
+        expect(() => {
+            delete Snowboard.globalEvent;
+        }).toThrow(TypeError);
+    });
+
     it('can add and remove a plugin', () => {
         Snowboard.addPlugin('testPlugin', TestPlugin);
 
@@ -151,6 +165,18 @@ describe('Snowboard framework', () => {
             expect.arrayContaining(['testsingleton']),
         );
         expect(Snowboard.testSingleton).not.toBeDefined();
+    });
+
+    it('can remove a plugin through the delete keyword', () => {
+        Snowboard.addPlugin('testPlugin', TestPlugin);
+
+        // Remove plugin
+        delete Snowboard.testPlugin;
+        expect(Snowboard.hasPlugin('testPlugin')).toEqual(false);
+        expect(Snowboard.getPluginNames()).not.toEqual(
+            expect.arrayContaining(['testplugin']),
+        );
+        expect(Snowboard.testPlugin).not.toBeDefined();
     });
 
     it('cannot get or remove a plugin that hasn\'t been added', () => {

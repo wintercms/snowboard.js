@@ -22,4 +22,13 @@ export default {
 
         return Reflect.has(target, prop);
     },
+
+    deleteProperty(target, prop) {
+        if (typeof prop === 'string' && target.hasPlugin(prop)) {
+            target.removePlugin(prop);
+            return true;
+        }
+
+        return false;
+    },
 };
