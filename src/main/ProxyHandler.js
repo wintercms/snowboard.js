@@ -1,23 +1,16 @@
 export default {
     get(target, prop, receiver) {
-        if (typeof prop === 'string') {
-            const propLower = prop.toLowerCase();
-
-            if (target.hasPlugin(propLower)) {
-                return (...params) => Reflect.get(target, 'plugins')[propLower].getInstance(...params);
-            }
+        if (typeof prop === 'string' && target.hasPlugin(prop)) {
+            return (...params) => Reflect.get(target, 'plugins')[prop.toLowerCase()]
+                .getInstance(...params);
         }
 
         return Reflect.get(target, prop, receiver);
     },
 
     has(target, prop) {
-        if (typeof prop === 'string') {
-            const propLower = prop.toLowerCase();
-
-            if (target.hasPlugin(propLower)) {
-                return true;
-            }
+        if (typeof prop === 'string' && target.hasPlugin(prop)) {
+            return true;
         }
 
         return Reflect.has(target, prop);

@@ -182,7 +182,7 @@ describe('Snowboard framework', () => {
     it('cannot get or remove a plugin that hasn\'t been added', () => {
         expect(() => {
             Snowboard.getPlugin('notExists');
-        }).toThrow('No plugin called "notexists" has been registered');
+        }).toThrow('No plugin called "notExists" has been registered');
 
         const groupCollapsedSpy = jest.spyOn(console, 'groupCollapsed').mockImplementation(() => {});
         const traceSpy = jest.spyOn(console, 'trace').mockImplementation(() => {});
@@ -192,7 +192,7 @@ describe('Snowboard framework', () => {
         SnowboardDebug.removePlugin('notExists');
 
         expect(groupCollapsedSpy).toHaveBeenCalled();
-        expect(groupCollapsedSpy).toHaveBeenLastCalledWith('%c[Snowboard]', 'color: rgb(45, 167, 199); font-weight: normal;', 'Plugin "notExists" already removed');
+        expect(groupCollapsedSpy).toHaveBeenLastCalledWith('%c[Snowboard]', 'color: rgb(45, 167, 199); font-weight: normal;', 'Plugin "notExists" doesn\'t exist or is already removed');
         expect(traceSpy).toHaveBeenCalled();
         expect(groupEndSpy).toHaveBeenCalled();
     });

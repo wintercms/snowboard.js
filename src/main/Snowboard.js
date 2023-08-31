@@ -138,15 +138,15 @@ export default class Snowboard {
      * @param {PluginBase} instance
      */
     addPlugin(name, instance) {
-        const lowerName = name.toLowerCase();
-
-        if (this.hasPlugin(lowerName)) {
+        if (this.hasPlugin(name)) {
             throw new Error(`A plugin called "${name}" is already registered.`);
         }
 
         if (instance.prototype instanceof PluginBase === false) {
             throw new Error('The provided plugin must extend the PluginBase class');
         }
+
+        const lowerName = name.toLowerCase();
 
         if (this[name] !== undefined || this[lowerName] !== undefined) {
             throw new Error('The given name is already in use for a property or method of the Snowboard class.');
@@ -183,12 +183,12 @@ export default class Snowboard {
      * @returns {void}
      */
     removePlugin(name) {
-        const lowerName = name.toLowerCase();
-
-        if (!this.hasPlugin(lowerName)) {
-            this.debug(`Plugin "${name}" already removed`);
+        if (!this.hasPlugin(name)) {
+            this.debug(`Plugin "${name}" doesn't exist or is already removed`);
             return;
         }
+
+        const lowerName = name.toLowerCase();
 
         // Call destructors for all instances
         this.plugins[lowerName].getInstances().forEach((instance) => {
@@ -196,8 +196,6 @@ export default class Snowboard {
         });
 
         delete this.plugins[lowerName];
-        delete this[lowerName];
-        delete this[name];
 
         this.debug(`Plugin "${name}" removed`);
     }
@@ -240,13 +238,11 @@ export default class Snowboard {
      * @returns {PluginLoader}
      */
     getPlugin(name) {
-        const lowerName = name.toLowerCase();
-
-        if (!this.hasPlugin(lowerName)) {
-            throw new Error(`No plugin called "${lowerName}" has been registered.`);
+        if (!this.hasPlugin(name)) {
+            throw new Error(`No plugin called "${name}" has been registered.`);
         }
 
-        return this.plugins[lowerName];
+        return this.plugins[name.toLowerCase()];
     }
 
     /**
@@ -261,15 +257,15 @@ export default class Snowboard {
      * @param {Object} instance
      */
     registerTrait(name, instance) {
-        const lowerName = name.toLowerCase();
-
-        if (this.hasTrait(lowerName)) {
+        if (this.hasTrait(name)) {
             throw new Error(`A trait called "${name}" is already registered.`);
         }
 
         if (typeof instance !== 'function') {
             throw new Error('The provided trait must be a class.');
         }
+
+        const lowerName = name.toLowerCase();
 
         if (this[name] !== undefined || this[lowerName] !== undefined) {
             throw new Error('The given name is already in use for a property or method of the Snowboard class.');

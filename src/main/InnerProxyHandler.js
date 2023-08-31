@@ -13,7 +13,7 @@ export default {
         if (typeof prop === 'string') {
             const propLower = prop.toLowerCase();
 
-            if (['attachAbstracts', 'loadUtilities', 'initialise', 'initialiseSingletons'].includes(prop)) {
+            if (['attachAbstracts', 'loadInbuilt', 'initialise', 'initialiseSingletons'].includes(prop)) {
                 throw new Error(`You cannot use the "${prop}" Snowboard method within a plugin.`);
             }
 
@@ -29,7 +29,7 @@ export default {
         if (typeof prop === 'string') {
             const propLower = prop.toLowerCase();
 
-            if (['attachAbstracts', 'loadUtilities', 'initialise', 'initialiseSingletons'].includes(prop)) {
+            if (['attachAbstracts', 'loadInbuilt', 'initialise', 'initialiseSingletons'].includes(prop)) {
                 return false;
             }
 
