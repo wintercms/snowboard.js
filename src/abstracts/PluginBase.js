@@ -23,9 +23,20 @@ export default class PluginBase {
      * Plugin constructor.
      *
      * This method should be treated as the true constructor of a plugin, and can be overwritten.
-     * It will be called straight after construction.
+     * It will be called straight after construction, but before traits are loaded, allowing you
+     * to define any required properties needed for the traits.
      */
     construct() {
+    }
+
+    /**
+     * Plugin initializer.
+     *
+     * This method is call after construction is complete and after traits are loaded. It can be
+     * used to run any functionality that you want available immediately after the plugin instance
+     * is ready to use.
+     */
+    init() {
     }
 
     /**
@@ -60,7 +71,7 @@ export default class PluginBase {
     /**
      * Plugin destructor (core)
      *
-     * The destructor is provided the Snowboard framework instance, and should not be overwritten
+     * The destructor calls some necessary destruction steps, and should not be overwritten
      * unless you absolutely know what you're doing.
      */
     destructor() {

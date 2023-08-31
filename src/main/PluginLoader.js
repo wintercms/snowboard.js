@@ -127,6 +127,7 @@ export default class PluginLoader {
         newInstance.detach = () => this.instances.splice(this.instances.indexOf(newInstance), 1);
         newInstance.construct(...parameters);
         this.loadTraits(newInstance);
+        newInstance.init();
         this.instances.push(newInstance);
 
         return newInstance;
@@ -179,6 +180,7 @@ export default class PluginLoader {
         newInstance.detach = () => this.instances.splice(this.instances.indexOf(newInstance), 1);
         newInstance.construct(...parameters);
         this.loadTraits(newInstance);
+        newInstance.init();
         this.instances.push(newInstance);
 
         this.singleton.initialised = true;

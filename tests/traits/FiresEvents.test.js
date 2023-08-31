@@ -24,6 +24,8 @@ describe('The FiresEvents trait', () => {
         Snowboard.addPlugin('testEvent', TestEventPlugin);
 
         const instance = Snowboard.testEvent();
+        expect(instance.eventPrefix).toBe('test');
+        expect(instance.ready).toBe(true);
 
         let test = null;
         let done = false;
