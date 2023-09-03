@@ -30,7 +30,7 @@
     ],
     "overrides": [
         {
-            "files": ["tests/**", "modules/*/tests/**"],
+            "files": ["tests/**", "packages/*/tests/**"],
             "plugins": ["jest"],
             "extends": ["plugin:jest/recommended"]
         }

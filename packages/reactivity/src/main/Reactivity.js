@@ -1,5 +1,5 @@
+import { Singleton } from '@wintercms/snowboard';
 import Alpine from 'alpinejs';
-import Singleton from '../../../src/abstracts/Singleton';
 
 export default class Reactivity extends Singleton {
     construct() {

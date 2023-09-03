@@ -1,13 +1,13 @@
-import TestInstance from '../../../src/main/Snowboard';
-import Reactivity from '../src/Reactivity';
+import { Snowboard as TestInstance } from '@wintercms/snowboard';
 import Alpine from 'alpinejs';
+import Reactivity from '../src/main/Reactivity';
 
 describe('Snowboard Reactivity module', () => {
     beforeEach(() => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/assets/';
 
-        window.Snowboard = new TestInstance;
+        window.Snowboard = new TestInstance();
     });
 
     test('Reactivity module can be installed', () => {
