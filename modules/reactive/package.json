@@ -1,0 +1,30 @@
+{
+    "name": "@wintercms/snowboard-reactive",
+    "version": "0.3.0",
+    "description": "Reactivity module for Snowboard, built on top of Alpine.js",
+    "keywords": [
+        "winter",
+        "wintercms",
+        "snowboard",
+        "framework",
+        "organization",
+        "management"
+    ],
+    "main": "dist/snowboard-reactive.esm.js",
+    "author": "Ben Thomson <git@alfreido.com>",
+    "homepage": "https://wintercms.com",
+    "repository": "github:wintercms/snowboard.js",
+    "bugs": "https://github.com/wintercms/snowboard.js/issues",
+    "license": "MIT",
+    "dependencies": {
+        "@wintercms/snowboard": "^0.3.0",
+        "alpinejs": "^3.13.0"
+    },
+    "files": [
+        "dist/*.js"
+    ],
+    "engines": {
+        "node": ">=14.18.0",
+        "npm": ">=8.0.0"
+    }
+}

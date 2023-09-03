@@ -25,11 +25,12 @@
         "rollup.*.config.mjs",
         "jest.config.js",
         "tests/*.js",
+        "modules/*/tests/*.js",
         "dist/"
     ],
     "overrides": [
         {
-            "files": ["tests/**"],
+            "files": ["tests/**", "modules/*/tests/**"],
             "plugins": ["jest"],
             "extends": ["plugin:jest/recommended"]
         }
