@@ -1,5 +1,11 @@
 import { createApp, reactive } from 'petite-vue';
 
+/**
+ * Constructor for the Reactivity functionality.
+ *
+ * This creates the necessary properties and modifies the constructor to initialize the Reactivity
+ * functionality.
+ */
 function reactivityConstructor() {
     if (this.reactivityInitialized) {
         throw new Error('Reactivity already initialized for this instance');
@@ -19,6 +25,12 @@ function reactivityConstructor() {
     }
 }
 
+/**
+ * Initialize the Reactivity functionality.
+ *
+ * This provides the lifecycle workflow in order to initialize reactivity and make it available in
+ * the plugin.
+ */
 function reactivityInitialize() {
     // Do not re-enable reactivity
     if (this.reactivityInitialized) {
@@ -31,6 +43,20 @@ function reactivityInitialize() {
     this.reactivityTemplate();
 }
 
+/**
+ * Get mappable properties.
+ *
+ * This method analyzes the current object and retrieves all properties and methods that will be
+ * made available to the reactivity data store.
+ *
+ * This will ignore certain properties and methods that are either required by Snowboard or are
+ * provided by the Reactivity package itself.
+ *
+ * The returned object will be keyed by the property or method name, and the value will be the
+ * definition of the method or property.
+ *
+ * @return {Object}
+ */
 function reactivityGetProperties() {
     // Do not re-enable reactivity
     if (this.reactivityInitialized) {
@@ -100,6 +126,14 @@ function reactivityGetProperties() {
     return mappable;
 }
 
+/**
+ * Create a reactivity data store.
+ *
+ * Taking the mappable properties, this converts them into an object that is then fed to Vue as the
+ * data store for reactivity.
+ *
+ * @return {Object}
+ */
 function reactivityCreateStore(mappable) {
     // Do not re-enable reactivity
     if (this.reactivityInitialized) {
@@ -135,6 +169,13 @@ function reactivityCreateStore(mappable) {
     return obj;
 }
 
+/**
+ * Map reactive properties to the original object.
+ *
+ * Once the mappable properties have been converted into a reactive data store, this method will
+ * map the properties back to the original object. This allows for the properties and methods to
+ * be accessed directly from the plugin instance and will react accordingly.
+ */
 function reactivityMapProperties(mappable) {
     // Do not re-enable reactivity
     if (this.reactivityInitialized) {
@@ -157,6 +198,15 @@ function reactivityMapProperties(mappable) {
     });
 }
 
+/**
+ * Fetches the available template.
+ *
+ * If the object provides a template function or string, this will create a template and embed it
+ * into the DOM.
+ *
+ * In the case of a function, the function may also return a DOM element directly, which will be
+ * used to mount directly to a specified element.
+ */
 function reactivityTemplate() {
     // Do not re-enable reactivity
     if (this.reactivityInitialized) {
@@ -185,6 +235,12 @@ function reactivityTemplate() {
     }
 }
 
+/**
+ * Mount reactivity to the DOM.
+ *
+ * Finally, the reactivity will be mounted to the DOM on the given element (or template), and will
+ * then be created as an application in Vue. It will then be ready for use.
+ */
 function reactivityMount(element, parent = null) {
     // Do not re-enable reactivity
     if (this.reactivityInitialized) {
