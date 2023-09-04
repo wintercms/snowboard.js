@@ -18,7 +18,6 @@
         "watch": "rollup -c rollup.esm.config.js -w",
         "lint": "eslint -c ../../.eslintrc.json --ext .js src tests",
         "test": "jest -c ../../jest.config.js ./tests/**/*.test.js",
-        "prepare": "husky install",
         "prepublishOnly": "npm run build"
     },
     "author": "Ben Thomson <git@alfreido.com>",
