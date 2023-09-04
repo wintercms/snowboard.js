@@ -35,6 +35,7 @@ export default class Snowboard {
     constructor(debug) {
         this.debugEnabled = (typeof debug === 'boolean' && debug === true);
         this.plugins = {};
+        this.abstracts = {};
         this.traits = {};
         this.listeners = {};
         this.foundBaseUrl = null;
@@ -73,13 +74,56 @@ export default class Snowboard {
      * ```
      */
     attachAbstracts() {
-        this.PluginBase = PluginBase;
-        this.Singleton = Singleton;
+        this.addAbstract('PluginBase', PluginBase);
+        this.addAbstract('Singleton', Singleton);
+    }
 
-        Object.freeze(this.PluginBase.prototype);
-        Object.freeze(this.PluginBase);
-        Object.freeze(this.Singleton.prototype);
-        Object.freeze(this.Singleton);
+    /**
+     * Adds an abstract.
+     *
+     * Abstracts are simply classes that can be extended upon by other plugins. They are registered
+     * under the Snowboard namespace to function for users without a build process or using the
+     * global Snowboard variable. Abstracts *must* extend the `PluginBase` abstract class in order
+     * to correctly function with the plugin loader.
+     *
+     * Abstracts will be frozen upon being added - this will prevent any further modification to the
+     * base classes. Abstracts also cannot be removed once added.
+     *
+     * Please note that, unlike plugins, abstracts are case-sensitive.
+     *
+     * @param {string} name
+     * @param {Object} instance
+     */
+    addAbstract(name, instance) {
+        if (this.hasPlugin(name) || this.hasAbstract(name)) {
+            throw new Error(`A plugin or abstract called "${name}" is already registered.`);
+        }
+
+        if (
+            (instance === PluginBase) === false
+            && instance.prototype instanceof PluginBase === false
+        ) {
+            throw new Error('The provided abstract must extend the PluginBase class');
+        }
+
+        const lowerName = name.toLowerCase();
+
+        if (this[name] !== undefined || this[lowerName] !== undefined) {
+            throw new Error('The given name is already in use for a property or method of the Snowboard class.');
+        }
+
+        this.abstracts[name] = instance;
+        Object.freeze(this.abstracts[name]);
+        Object.freeze(this.abstracts[name].prototype);
+    }
+
+    /**
+     * Determines if an abstract of the given name is available.
+     *
+     * @param {string} name
+     */
+    hasAbstract(name) {
+        return (this.abstracts[name] !== undefined);
     }
 
     /**
@@ -138,8 +182,8 @@ export default class Snowboard {
      * @param {PluginBase} instance
      */
     addPlugin(name, instance) {
-        if (this.hasPlugin(name)) {
-            throw new Error(`A plugin called "${name}" is already registered.`);
+        if (this.hasPlugin(name) || this.hasAbstract(name)) {
+            throw new Error(`A plugin or abstract called "${name}" is already registered.`);
         }
 
         if (instance.prototype instanceof PluginBase === false) {
