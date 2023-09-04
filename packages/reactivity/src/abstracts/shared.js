@@ -232,6 +232,8 @@ function reactivityTemplate() {
             throw new Error('Template must only have one root node');
         }
         this.reactivityMount(rendered.body.childNodes[0]);
+    } else if (this.template instanceof HTMLElement) {
+        this.reactivityMount(this.template);
     }
 }
 

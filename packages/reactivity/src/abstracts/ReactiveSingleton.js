@@ -30,7 +30,6 @@ class ReactiveSingleton extends Singleton {
     }
 
     construct() {
-        super.construct();
     }
 }
 

@@ -29,7 +29,6 @@ class ReactivePluginBase extends PluginBase {
     }
 
     construct() {
-        super.construct();
     }
 }
 
