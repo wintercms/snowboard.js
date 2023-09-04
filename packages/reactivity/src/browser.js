@@ -1,3 +1,5 @@
-import Reactivity from './main/Reactivity';
+import ReactivePluginBase from './abstracts/ReactivePluginBase';
+import ReactiveSingleton from './abstracts/ReactiveSingleton';
 
-window.Snowboard.addPlugin('reactivity', Reactivity);
+window.Snowboard.addAbstract('ReactiveSingleton', ReactiveSingleton);
+window.Snowboard.addAbstract('ReactivePluginBase', ReactivePluginBase);

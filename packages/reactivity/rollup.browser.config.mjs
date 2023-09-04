@@ -6,7 +6,6 @@ export default {
     input: 'src/browser.js',
     external: [
         '@wintercms/snowboard',
-        /@babel\/runtime/,
     ],
     output: [
         {
@@ -27,6 +26,6 @@ export default {
     ],
     plugins: [
         nodeResolve(),
-        babel({ babelHelpers: 'bundled', exclude: '**/node_modules/**' }),
+        babel({ babelHelpers: 'runtime', exclude: '**/node_modules/**' }),
     ],
 };

@@ -1,5 +1,5 @@
 {
-    "name": "@wintercms/snowboard-reactive",
+    "name": "@wintercms/snowboard-reactivity",
     "version": "0.3.0",
     "description": "Reactivity module for Snowboard, built on top of Alpine.js",
     "keywords": [
@@ -10,7 +10,7 @@
         "organization",
         "management"
     ],
-    "main": "dist/snowboard-reactive.esm.js",
+    "main": "dist/snowboard-reactivity.esm.js",
     "scripts": {
         "build": "npm run build:esm && npm run build:browser",
         "build:browser": "rollup -c rollup.browser.config.mjs",
@@ -22,7 +22,7 @@
     "bugs": "https://github.com/wintercms/snowboard.js/issues",
     "license": "MIT",
     "dependencies": {
-        "alpinejs": "^3.13.0"
+        "petite-vue": "^0.4.1"
     },
     "peerDependencies": {
         "@wintercms/snowboard": "*"
