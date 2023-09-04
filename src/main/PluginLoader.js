@@ -334,7 +334,7 @@ export default class PluginLoader {
 
             // Get methods defined in trait prototype.
             Object.getOwnPropertyNames(TraitInstance.prototype).forEach((propertyName) => {
-                if (['constructor', 'construct', 'destruct', 'destructor'].includes(propertyName)) {
+                if (['constructor', 'construct', 'init', 'destruct', 'destructor', 'detach'].includes(propertyName)) {
                     return;
                 }
 
