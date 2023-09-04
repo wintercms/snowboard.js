@@ -1,6 +1,7 @@
 import { nextTick } from 'petite-vue';
 import { Snowboard as TestInstance } from '@wintercms/snowboard';
 import TestReactiveSingleton from '../fixtures/TestReactiveSingleton';
+import TestSnowboardTemplate from '../fixtures/TestSnowboardTemplate';
 
 describe('Snowboard Reactivity package', () => {
     beforeEach(() => {
@@ -45,5 +46,53 @@ describe('Snowboard Reactivity package', () => {
                 expect(div.querySelector('p').textContent).toBe('Count: 2');
             });
         });
+    });
+
+    test('Won\'t allow reactivity to be initialised twice', () => {
+        expect(() => {
+            Snowboard.addPlugin('testReactivitySingleton', TestReactiveSingleton);
+        }).not.toThrow();
+
+        const instance = Snowboard.testReactivitySingleton();
+        expect(instance.reactivityInitialized).toBe(true);
+
+        expect(() => {
+            instance.reactivityConstructor();
+        }).toThrow();
+        expect(() => {
+            instance.reactivityInitialize();
+        }).toThrow();
+        expect(() => {
+            instance.reactivityGetProperties();
+        }).toThrow();
+        expect(() => {
+            instance.reactivityCreateStore();
+        }).toThrow();
+        expect(() => {
+            instance.reactivityMapProperties();
+        }).toThrow();
+        expect(() => {
+            instance.reactivityTemplate();
+        }).toThrow();
+        expect(() => {
+            instance.reactivityMount();
+        }).toThrow();
+
+        expect(() => {
+            instance.reactivityInitialized = false;
+        }).toThrow();
+    });
+
+    test('Won\'t populate Snowboard in the template', () => {
+        const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+
+        Snowboard.addPlugin('testSnowboardTemplate', TestSnowboardTemplate);
+
+        const instance = Snowboard.testSnowboardTemplate();
+        const div = instance.reactivityElement;
+
+        expect(div.querySelector('strong').textContent).toBe('');
+        expect(errorSpy).toHaveBeenCalled();
+        expect(errorSpy).toHaveBeenLastCalledWith(new ReferenceError('snowboard is not defined'));
     });
 });
