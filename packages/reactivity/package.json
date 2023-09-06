@@ -1,0 +1,40 @@
+{
+    "name": "@wintercms/snowboard-reactivity",
+    "version": "0.3.0",
+    "description": "Reactivity module for Snowboard, built on top of Alpine.js",
+    "keywords": [
+        "winter",
+        "wintercms",
+        "snowboard",
+        "framework",
+        "organization",
+        "management"
+    ],
+    "main": "dist/snowboard-reactivity.esm.js",
+    "scripts": {
+        "build": "npm run build:esm && npm run build:browser",
+        "build:browser": "rollup -c rollup.browser.config.mjs",
+        "build:esm": "rollup -c rollup.esm.config.mjs",
+        "lint": "eslint -c ../../.eslintrc.json --ext .js src tests",
+        "test": "jest -c ../../jest.config.js ./tests/**/*.test.js",
+        "prepublishOnly": "npm run build"
+    },
+    "author": "Ben Thomson <git@alfreido.com>",
+    "homepage": "https://wintercms.com",
+    "repository": "github:wintercms/snowboard.js",
+    "bugs": "https://github.com/wintercms/snowboard.js/issues",
+    "license": "MIT",
+    "dependencies": {
+        "petite-vue": "^0.4.1"
+    },
+    "peerDependencies": {
+        "@wintercms/snowboard": "*"
+    },
+    "files": [
+        "dist/*.js"
+    ],
+    "engines": {
+        "node": ">=14.18.0",
+        "npm": ">=8.0.0"
+    }
+}
