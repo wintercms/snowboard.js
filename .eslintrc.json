@@ -26,7 +26,8 @@
         "jest.config.js",
         "tests/*.js",
         "modules/*/tests/*.js",
-        "dist/"
+        "dist/",
+        "packages/*/dist/"
     ],
     "overrides": [
         {

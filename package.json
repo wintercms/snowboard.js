@@ -1,6 +1,6 @@
 {
     "scripts": {
-        "lint": "npm run lint --workspaces",
+        "lint": "eslint --ext .js packages/*/src packages/*/tests",
         "test": "jest",
         "build": "npm run build --workspaces",
         "publish": "npm run publish --workspaces",
