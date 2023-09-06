@@ -3,7 +3,6 @@
         "lint": "eslint --ext .js packages/*/src packages/*/tests",
         "test": "jest",
         "build": "npm run build --workspaces",
-        "publish": "npm run publish --workspaces",
         "prepare": "husky install"
     },
     "author": "Ben Thomson <git@alfreido.com>",
