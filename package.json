@@ -1,7 +1,7 @@
 {
     "scripts": {
         "lint": "npm run lint --workspaces",
-        "test": "npm run test --workspaces",
+        "test": "jest",
         "build": "npm run build --workspaces",
         "publish": "npm run publish --workspaces",
         "prepare": "husky install"
