@@ -33,12 +33,35 @@ export default class Snowboard {
      * @param {boolean} debug Whether debugging logs should be shown. Default: `false`.
      */
     constructor(debug) {
+        /**
+         * Whether debugging logs should be shown.
+         * @type {boolean}
+         */
         this.debugEnabled = (typeof debug === 'boolean' && debug === true);
+        /**
+         * Registered plugins.
+         * @type {Object.<string, PluginLoader>}
+         */
         this.plugins = {};
+        /**
+         * Registered abstracts.
+         * @type {Object.<string, object>}
+         */
         this.abstracts = {};
+        /**
+         * Registered traits.
+         * @type {Object.<string, object>}
+         */
         this.traits = {};
+        /**
+         * Listeners, keyed by event name.
+         * @type {Object.<string, Array.<function>}
+         */
         this.listeners = {};
-        this.foundBaseUrl = null;
+        /**
+         * Readiness tracking for the framework.
+         * @type {{dom: boolean}}
+         */
         this.readiness = {
             dom: false,
         };
@@ -72,6 +95,8 @@ export default class Snowboard {
      *     ...
      * }
      * ```
+     *
+     * @return {void}
      */
     attachAbstracts() {
         this.addAbstract('PluginBase', PluginBase);
@@ -93,6 +118,7 @@ export default class Snowboard {
      *
      * @param {string} name
      * @param {Object} instance
+     * @return {void}
      */
     addAbstract(name, instance) {
         if (this.hasPlugin(name) || this.hasAbstract(name)) {
@@ -121,6 +147,7 @@ export default class Snowboard {
      * Determines if an abstract of the given name is available.
      *
      * @param {string} name
+     * @return {boolean}
      */
     hasAbstract(name) {
         return (this.abstracts[name] !== undefined);
@@ -128,6 +155,8 @@ export default class Snowboard {
 
     /**
      * Loads the default traits and utilities.
+     *
+     * @return {void}
      */
     loadInbuilt() {
         this.registerTrait('configurable', Configurable);
@@ -144,6 +173,10 @@ export default class Snowboard {
      *
      * Attaches a listener for the DOM being ready and triggers a global "ready" event for plugins
      * to begin attaching themselves to the DOM.
+     *
+     * If no window is found, the framework is considered ready immediately.
+     *
+     * @return {void}
      */
     initialise() {
         window.addEventListener('DOMContentLoaded', () => {
@@ -155,6 +188,8 @@ export default class Snowboard {
 
     /**
      * Initialises an instance of every singleton.
+     *
+     * @return {void}
      */
     initialiseSingletons() {
         Object.values(this.plugins).forEach((plugin) => {
@@ -180,6 +215,7 @@ export default class Snowboard {
      *
      * @param {string} name
      * @param {PluginBase} instance
+     * @return {void}
      */
     addPlugin(name, instance) {
         if (this.hasPlugin(name) || this.hasAbstract(name)) {
@@ -224,7 +260,7 @@ export default class Snowboard {
      * the plugin.
      *
      * @param {string} name
-     * @returns {void}
+     * @return {void}
      */
     removePlugin(name) {
         if (!this.hasPlugin(name)) {
@@ -250,7 +286,7 @@ export default class Snowboard {
      * A plugin that is still waiting for dependencies to be registered will not be active.
      *
      * @param {string} name
-     * @returns {boolean}
+     * @return {boolean}
      */
     hasPlugin(name) {
         const lowerName = name.toLowerCase();
@@ -261,7 +297,7 @@ export default class Snowboard {
     /**
      * Returns an array of registered plugins as PluginLoader objects.
      *
-     * @returns {PluginLoader[]}
+     * @return {Object.<string, PluginLoader>}
      */
     getPlugins() {
         return this.plugins;
@@ -270,7 +306,7 @@ export default class Snowboard {
     /**
      * Returns an array of registered plugins, by name.
      *
-     * @returns {string[]}
+     * @return {string[]}
      */
     getPluginNames() {
         return Object.keys(this.plugins);
@@ -279,7 +315,7 @@ export default class Snowboard {
     /**
      * Returns a PluginLoader object of a given plugin.
      *
-     * @returns {PluginLoader}
+     * @return {PluginLoader}
      */
     getPlugin(name) {
         if (!this.hasPlugin(name)) {
@@ -299,6 +335,7 @@ export default class Snowboard {
      *
      * @param {string} name
      * @param {Object} instance
+     * @return {void}
      */
     registerTrait(name, instance) {
         if (this.hasTrait(name)) {
@@ -324,7 +361,7 @@ export default class Snowboard {
      * Determines if a trait has been registered.
      *
      * @param {string} name
-     * @returns {boolean}
+     * @return {boolean}
      */
     hasTrait(name) {
         const lowerName = name.toLowerCase();
@@ -335,7 +372,7 @@ export default class Snowboard {
     /**
      * Returns an array of registered traits as individual class objects.
      *
-     * @returns {Object[]}
+     * @return {Object.<string, object>}
      */
     getTraits() {
         return this.traits;
@@ -344,7 +381,7 @@ export default class Snowboard {
     /**
      * Returns the prototype of the given trait.
      *
-     * @returns {Object}
+     * @return {Object}
      */
     getTrait(name) {
         if (!this.hasTrait(name)) {
@@ -359,11 +396,11 @@ export default class Snowboard {
     /**
      * Finds all plugins that listen to the given event.
      *
-     * This works for both normal and promise events. It does NOT check that the plugin's listener
+     * This works for both normal and promise events. It does *not* check that the plugin's listener
      * actually exists.
      *
      * @param {string} eventName
-     * @returns {string[]} The name of the plugins that are listening to this event.
+     * @return {string[]} The name of the plugins that are listening to this event.
      */
     listensToEvent(eventName) {
         const plugins = [];
@@ -392,6 +429,7 @@ export default class Snowboard {
      * attach themselves to Snowboard immediately but only fire when the DOM is ready.
      *
      * @param {Function} callback
+     * @return {void}
      */
     ready(callback) {
         if (this.readiness.dom) {
@@ -410,6 +448,7 @@ export default class Snowboard {
      *
      * @param {String} eventName
      * @param {Function} callback
+     * @return {void}
      */
     on(eventName, callback) {
         if (!this.listeners[eventName]) {
@@ -426,6 +465,7 @@ export default class Snowboard {
      *
      * @param {String} eventName
      * @param {Function} callback
+     * @return {void}
      */
     off(eventName, callback) {
         if (!this.listeners[eventName]) {
@@ -446,7 +486,7 @@ export default class Snowboard {
      * If any plugin returns a `false`, the event is considered cancelled.
      *
      * @param {string} eventName
-     * @returns {boolean} If event was not cancelled
+     * @return {boolean} If event was not cancelled
      */
     globalEvent(eventName, ...parameters) {
         this.debug(`Calling global event "${eventName}"`, ...parameters);
@@ -548,6 +588,7 @@ export default class Snowboard {
      * If no listeners are found, a resolved Promise is returned.
      *
      * @param {string} eventName
+     * @return {Promise}
      */
     globalPromiseEvent(eventName, ...parameters) {
         this.debug(`Calling global promise event "${eventName}"`);
@@ -647,7 +688,7 @@ export default class Snowboard {
      *
      * Includes parameters and a stack trace.
      *
-     * @returns {void}
+     * @return {void}
      */
     logMessage(color, bold, message, ...parameters) {
         /* eslint-disable */
@@ -682,7 +723,7 @@ export default class Snowboard {
     /**
      * Log a message.
      *
-     * @returns {void}
+     * @return {void}
      */
     log(message, ...parameters) {
         this.logMessage('rgb(45, 167, 199)', false, message, ...parameters);
@@ -693,7 +734,7 @@ export default class Snowboard {
      *
      * These messages are only shown when debugging is enabled.
      *
-     * @returns {void}
+     * @return {void}
      */
     debug(message, ...parameters) {
         if (!this.debugEnabled) {
@@ -708,7 +749,7 @@ export default class Snowboard {
      *
      * These messages are only shown when debugging is enabled.
      *
-     * @returns {void}
+     * @return {void}
      */
     warning(message, ...parameters) {
         if (!this.debugEnabled) {
@@ -721,7 +762,7 @@ export default class Snowboard {
     /**
      * Logs an error message.
      *
-     * @returns {void}
+     * @return {void}
      */
     error(message, ...parameters) {
         this.logMessage('rgb(211, 71, 71)', true, message, ...parameters);
