@@ -4,7 +4,7 @@ export default {
     input: 'src/esm.js',
     external: [
         '@wintercms/snowboard',
-        'alpinejs'
+        'petite-vue',
     ],
     output: [
         {

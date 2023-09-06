@@ -36,7 +36,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/snowboard.js
+          asset_path: ./packages/base/dist/snowboard.js
           asset_name: snowboard.js
           asset_content_type: application/javascript
 
@@ -46,6 +46,26 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./dist/snowboard.min.js
+          asset_path: ./packages/base/dist/snowboard.min.js
+          asset_name: snowboard.min.js
+          asset_content_type: application/javascript
+
+      - name: Upload release asset snowboard-reactivity.js
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./packages/reactivity/dist/snowboard.js
+          asset_name: snowboard.js
+          asset_content_type: application/javascript
+
+      - name: Upload release asset snowboard-reactivity.min.js
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./packages/reactivity/dist/snowboard.min.js
           asset_name: snowboard.min.js
           asset_content_type: application/javascript
