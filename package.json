@@ -1,35 +1,15 @@
 {
-    "name": "@wintercms/snowboard",
-    "version": "0.3.0",
-    "description": "The Winter CMS Snowboard.js framework as a standalone module",
-    "keywords": [
-        "winter",
-        "wintercms",
-        "snowboard",
-        "framework",
-        "organization",
-        "management"
-    ],
-    "main": "dist/snowboard.esm.js",
     "scripts": {
-        "build": "npm run build:esm && npm run build:browser",
-        "build:browser": "rollup -c rollup.browser.config.mjs",
-        "build:esm": "rollup -c rollup.esm.config.mjs",
-        "watch": "rollup -c rollup.esm.config.js -w",
-        "lint": "eslint --ext .js src tests",
-        "test": "jest",
-        "prepare": "husky install",
-        "prepublishOnly": "npm run build"
+        "lint": "npm run lint --workspaces",
+        "build": "npm run build --workspaces",
+        "publish": "npm run publish --workspaces",
+        "prepare": "husky install"
     },
     "author": "Ben Thomson <git@alfreido.com>",
     "homepage": "https://wintercms.com",
     "repository": "github:wintercms/snowboard.js",
     "bugs": "https://github.com/wintercms/snowboard.js/issues",
     "license": "MIT",
-    "dependencies": {
-        "js-cookie": "^3.0.5",
-        "json5": "^2.2.3"
-    },
     "devDependencies": {
         "@babel/core": "^7.22.9",
         "@babel/plugin-transform-runtime": "^7.22.9",
@@ -49,14 +29,12 @@
         "jest-environment-jsdom": "^29.6.2",
         "rollup": "^3.27.2"
     },
-    "files": [
-        "dist/*.js"
-    ],
     "engines": {
         "node": ">=14.18.0",
         "npm": ">=8.0.0"
     },
     "workspaces": [
+        "packages/base",
         "packages/reactivity"
     ]
 }
