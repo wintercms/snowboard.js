@@ -179,11 +179,17 @@ export default class Snowboard {
      * @return {void}
      */
     initialise() {
-        window.addEventListener('DOMContentLoaded', () => {
+        const ready = () => {
             this.initialiseSingletons();
             this.globalEvent('ready');
             this.readiness.dom = true;
-        });
+        };
+
+        if (!window) {
+            ready();
+        }
+
+        window.addEventListener('DOMContentLoaded', ready);
     }
 
     /**
