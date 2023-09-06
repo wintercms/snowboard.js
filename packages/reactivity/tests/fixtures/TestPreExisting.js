@@ -3,10 +3,7 @@ import ReactivePluginBase from '../../src/abstracts/ReactivePluginBase';
 export default class TestPreExisting extends ReactivePluginBase {
     construct() {
         this.shown = false;
-    }
-
-    template() {
-        return document.querySelector('#test');
+        this.template = document.querySelector('#test');
     }
 
     show() {

@@ -1,46 +1,80 @@
 import { createApp, reactive } from 'petite-vue';
 
 /**
- * Constructor for the Reactivity functionality.
+ * Mount reactivity to the DOM.
  *
- * This creates the necessary properties and modifies the constructor to initialize the Reactivity
- * functionality.
+ * Finally, the reactivity will be mounted to the DOM on the given element (or template), and will
+ * then be created as an application in Vue. It will then be ready for use.
  */
-function reactivityConstructor() {
-    if (this.reactivityInitialized) {
+function reactivityMount(element, parent = null) {
+    if (this.$reactive) {
         throw new Error('Reactivity already initialized for this instance');
     }
 
-    this.reactivityInitialized = false;
-    this.reactivityStore = {};
-    this.reactivityElement = null;
+    let parentNode = parent;
 
-    // Wrap the instance's constructor to call the Reactivity initialisation after construct
-    if (typeof this.construct === 'function') {
-        this.baseConstruct = this.construct;
-        this.construct = (...args) => {
-            this.baseConstruct(...args);
-            this.reactivityInitialize();
-        };
+    if (document.body.contains(element) && !parent) {
+        parentNode = element.parentNode;
+    } else if (!document.body.contains(element) && !parent) {
+        parentNode = document.body;
     }
+
+    if (!document.body.contains(element)) {
+        parentNode.appendChild(element);
+    }
+
+    createApp(this.$data).mount(element);
+    this.$el = element;
+
+    // Import next tick into plugin
+    this.$nextTick = this.$data.$nextTick;
+
+    // Prevent reactivity from being reset
+    this.$reactive = true;
+    Object.defineProperty(this, '$reactive', { configurable: false, writable: false });
 }
 
 /**
- * Initialize the Reactivity functionality.
+ * Fetches the available template.
  *
- * This provides the lifecycle workflow in order to initialize reactivity and make it available in
- * the plugin.
+ * If the object provides a template function or string, this will create a template and embed it
+ * into the DOM.
+ *
+ * In the case of a function, the function may also return a DOM element directly, which will be
+ * used to mount directly to a specified element.
  */
-function reactivityInitialize() {
-    // Do not re-enable reactivity
-    if (this.reactivityInitialized) {
-        throw new Error('Reactivity already initialized for this instance');
+function reactivityTemplate() {
+    let template = null;
+
+    if (typeof this.template === 'function') {
+        template = this.template();
+    } else {
+        template = this.template;
     }
 
-    const mappable = this.reactivityGetProperties();
-    this.reactivityStore = reactive(this.reactivityCreateStore(mappable));
-    this.reactivityMapProperties(mappable);
-    this.reactivityTemplate();
+    if (!template) {
+        return;
+    }
+
+    if (typeof template === 'string') {
+        const parser = new DOMParser();
+        const rendered = parser.parseFromString(template, 'text/html');
+        if (rendered.body.childElementCount > 1) {
+            throw new Error('Template must only have one root node');
+        }
+        if (rendered.body.firstElementChild instanceof HTMLTemplateElement) {
+            throw new Error('A string template must not return a template element');
+        }
+        reactivityMount.call(this, rendered.body.firstElementChild);
+    } else if (template instanceof HTMLTemplateElement) {
+        if (template.content.childElementCount > 1) {
+            throw new Error('Template must only have one root node');
+        }
+        const cloned = template.content.firstElementChild.cloneNode(true);
+        reactivityMount.call(this, cloned);
+    } else if (template instanceof HTMLElement) {
+        reactivityMount.call(this, template);
+    }
 }
 
 /**
@@ -58,11 +92,6 @@ function reactivityInitialize() {
  * @return {Object}
  */
 function reactivityGetProperties() {
-    // Do not re-enable reactivity
-    if (this.reactivityInitialized) {
-        throw new Error('Reactivity already initialized for this instance');
-    }
-
     const mappable = {};
     const props = Object.getOwnPropertyDescriptors(this);
     const protoProps = Object.getOwnPropertyDescriptors(Object.getPrototypeOf(this));
@@ -76,6 +105,10 @@ function reactivityGetProperties() {
         'destruct',
         'destructor',
         'detach',
+        '$reactive',
+        '$mount',
+        '$el',
+        '$data',
     ];
 
     Object.entries(protoProps).forEach(([key, prop]) => {
@@ -135,11 +168,6 @@ function reactivityGetProperties() {
  * @return {Object}
  */
 function reactivityCreateStore(mappable) {
-    // Do not re-enable reactivity
-    if (this.reactivityInitialized) {
-        throw new Error('Reactivity already initialized for this instance');
-    }
-
     const obj = {};
 
     Object.entries(mappable).forEach(([key, prop]) => {
@@ -177,104 +205,57 @@ function reactivityCreateStore(mappable) {
  * be accessed directly from the plugin instance and will react accordingly.
  */
 function reactivityMapProperties(mappable) {
-    // Do not re-enable reactivity
-    if (this.reactivityInitialized) {
-        throw new Error('Reactivity already initialized for this instance');
-    }
-
     Object.entries(mappable).forEach(([key, prop]) => {
         if (prop.type === 'function' || prop.type === 'getter') {
             Object.defineProperty(
                 this,
                 key,
-                Object.getOwnPropertyDescriptor(this.reactivityStore, key),
+                Object.getOwnPropertyDescriptor(this.$data, key),
             );
         } else {
             Object.defineProperty(this, key, {
-                get() { return this.reactivityStore[key]; },
-                set(value) { this.reactivityStore[key] = value; },
+                get() { return this.$data[key]; },
+                set(value) { this.$data[key] = value; },
             });
         }
     });
 }
 
 /**
- * Fetches the available template.
+ * Initialize the Reactivity functionality.
  *
- * If the object provides a template function or string, this will create a template and embed it
- * into the DOM.
- *
- * In the case of a function, the function may also return a DOM element directly, which will be
- * used to mount directly to a specified element.
+ * This provides the lifecycle workflow in order to initialize reactivity and make it available in
+ * the plugin.
  */
-function reactivityTemplate() {
-    // Do not re-enable reactivity
-    if (this.reactivityInitialized) {
-        throw new Error('Reactivity already initialized for this instance');
-    }
-
-    if (typeof this.template === 'function') {
-        const template = this.template();
-        if (typeof template === 'string') {
-            const parser = new DOMParser();
-            const rendered = parser.parseFromString(template, 'text/html');
-            if (rendered.body.childNodes > 1) {
-                throw new Error('Template must only have one root node');
-            }
-            this.reactivityMount(rendered.body.childNodes[0]);
-        } else if (template instanceof HTMLElement) {
-            this.reactivityMount(template);
-        }
-    } else if (typeof this.template === 'string') {
-        const parser = new DOMParser();
-        const rendered = parser.parseFromString(this.template, 'text/html');
-        if (rendered.body.childNodes > 1) {
-            throw new Error('Template must only have one root node');
-        }
-        this.reactivityMount(rendered.body.childNodes[0]);
-    } else if (this.template instanceof HTMLElement) {
-        this.reactivityMount(this.template);
-    }
+function reactivityInitialize() {
+    const mappable = reactivityGetProperties.call(this);
+    this.$data = reactive(reactivityCreateStore.call(this, mappable));
+    reactivityMapProperties.call(this, mappable);
+    reactivityTemplate.call(this);
 }
 
 /**
- * Mount reactivity to the DOM.
+ * Constructor for the Reactivity functionality.
  *
- * Finally, the reactivity will be mounted to the DOM on the given element (or template), and will
- * then be created as an application in Vue. It will then be ready for use.
+ * This creates the necessary properties and modifies the constructor to initialize the Reactivity
+ * functionality.
  */
-function reactivityMount(element, parent = null) {
-    // Do not re-enable reactivity
-    if (this.reactivityInitialized) {
-        throw new Error('Reactivity already initialized for this instance');
+function reactivityConstructor() {
+    this.$reactive = false;
+    this.$data = {};
+    this.$el = null;
+
+    // Wrap the instance's constructor to call the Reactivity initialisation after construct
+    if (typeof this.construct === 'function') {
+        this.baseConstruct = this.construct;
+        this.construct = (...args) => {
+            this.baseConstruct(...args);
+            reactivityInitialize.call(this);
+        };
     }
-
-    let parentNode = parent;
-
-    if (document.body.contains(element) && !parent) {
-        parentNode = element.parentNode;
-    } else if (!document.body.contains(element) && !parent) {
-        parentNode = document.body;
-    }
-
-    if (!document.body.contains(element)) {
-        parentNode.appendChild(element);
-    }
-
-    createApp(this.reactivityStore).mount(element);
-    this.reactivityElement = element;
-
-    // Prevent reactivity from being reset
-    this.reactivityInitialized = true;
-    Object.defineProperty(this, 'reactivityInitialized', { configurable: false, writable: false });
 }
 
 export {
     reactivityConstructor,
-    reactivityInitialize,
-    reactivityGetProperties,
-    reactivityCreateStore,
-    reactivityMapProperties,
-    reactivityTemplate,
     reactivityMount,
 };

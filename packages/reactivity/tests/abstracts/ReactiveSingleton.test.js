@@ -26,10 +26,10 @@ describe('Snowboard Reactivity package', () => {
         expect(instance).toBeInstanceOf(TestReactiveSingleton);
         expect(instance).toBeInstanceOf(Singleton);
         expect(instance).toBeInstanceOf(PluginBase);
-        const div = instance.reactivityElement;
+        const div = instance.$el;
 
         expect(instance.count).toBe(0);
-        expect(instance.reactivityStore.count).toBe(0);
+        expect(instance.$data.count).toBe(0);
         expect(div).toBeInstanceOf(HTMLDivElement);
         expect(div.querySelector('strong').textContent).toBe('0');
         expect(div.querySelector('p').textContent).toBe('Count: 0');
@@ -39,7 +39,7 @@ describe('Snowboard Reactivity package', () => {
 
         nextTick(() => {
             expect(instance.count).toBe(1);
-            expect(instance.reactivityStore.count).toBe(1);
+            expect(instance.$data.count).toBe(1);
             expect(div.querySelector('strong').textContent).toBe('1');
             expect(div.querySelector('p').textContent).toBe('Count: 1');
 
@@ -48,7 +48,7 @@ describe('Snowboard Reactivity package', () => {
 
             nextTick(() => {
                 expect(instance.count).toBe(2);
-                expect(instance.reactivityStore.count).toBe(2);
+                expect(instance.$data.count).toBe(2);
                 expect(div.querySelector('strong').textContent).toBe('2');
                 expect(div.querySelector('p').textContent).toBe('Count: 2');
             });
@@ -61,32 +61,14 @@ describe('Snowboard Reactivity package', () => {
         }).not.toThrow();
 
         const instance = Snowboard.testReactivitySingleton();
-        expect(instance.reactivityInitialized).toBe(true);
+        expect(instance.$reactive).toBe(true);
 
         expect(() => {
-            instance.reactivityConstructor();
-        }).toThrow();
-        expect(() => {
-            instance.reactivityInitialize();
-        }).toThrow();
-        expect(() => {
-            instance.reactivityGetProperties();
-        }).toThrow();
-        expect(() => {
-            instance.reactivityCreateStore();
-        }).toThrow();
-        expect(() => {
-            instance.reactivityMapProperties();
-        }).toThrow();
-        expect(() => {
-            instance.reactivityTemplate();
-        }).toThrow();
-        expect(() => {
-            instance.reactivityMount();
+            instance.$mount();
         }).toThrow();
 
         expect(() => {
-            instance.reactivityInitialized = false;
+            instance.$reactive = false;
         }).toThrow();
     });
 
@@ -96,7 +78,7 @@ describe('Snowboard Reactivity package', () => {
         Snowboard.addPlugin('testSnowboardTemplate', TestSnowboardTemplate);
 
         const instance = Snowboard.testSnowboardTemplate();
-        const div = instance.reactivityElement;
+        const div = instance.$el;
 
         expect(div.querySelector('strong').textContent).toBe('');
         expect(errorSpy).toHaveBeenCalled();
@@ -106,11 +88,11 @@ describe('Snowboard Reactivity package', () => {
     test('Allows a single instance of a singleton', () => {
         Snowboard.addPlugin('testReactivitySingleton', TestReactiveSingleton);
         const instanceOne = Snowboard.testReactivitySingleton();
-        const countOne = instanceOne.reactivityElement.querySelector('strong');
-        const buttonOne = instanceOne.reactivityElement.querySelector('button');
+        const countOne = instanceOne.$el.querySelector('strong');
+        const buttonOne = instanceOne.$el.querySelector('button');
         const instanceTwo = Snowboard.testReactivitySingleton();
-        const countTwo = instanceTwo.reactivityElement.querySelector('strong');
-        const buttonTwo = instanceTwo.reactivityElement.querySelector('button');
+        const countTwo = instanceTwo.$el.querySelector('strong');
+        const buttonTwo = instanceTwo.$el.querySelector('button');
 
         expect(instanceOne).toBe(instanceTwo);
         expect(document.querySelectorAll('div').length).toBe(1);
@@ -121,11 +103,11 @@ describe('Snowboard Reactivity package', () => {
 
         nextTick(() => {
             expect(instanceOne.count).toBe(2);
-            expect(instanceOne.reactivityStore.count).toBe(2);
+            expect(instanceOne.$data.count).toBe(2);
             expect(countOne.textContent).toBe('2');
 
             expect(instanceTwo.count).toBe(2);
-            expect(instanceTwo.reactivityStore.count).toBe(2);
+            expect(instanceTwo.$data.count).toBe(2);
             expect(countTwo.textContent).toBe('2');
 
             const evt2 = new Event('click', { bubbles: true });
@@ -133,11 +115,11 @@ describe('Snowboard Reactivity package', () => {
 
             nextTick(() => {
                 expect(instanceOne.count).toBe(3);
-                expect(instanceOne.reactivityStore.count).toBe(3);
+                expect(instanceOne.$data.count).toBe(3);
                 expect(countOne.textContent).toBe('3');
 
                 expect(instanceTwo.count).toBe(3);
-                expect(instanceTwo.reactivityStore.count).toBe(3);
+                expect(instanceTwo.$data.count).toBe(3);
                 expect(countTwo.textContent).toBe('3');
             });
         });
