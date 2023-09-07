@@ -19,6 +19,10 @@ export default class TestList extends ReactivePluginBase {
         `;
     }
 
+    mountTo() {
+        return document.body;
+    }
+
     addName(name) {
         this.names.push(name);
     }

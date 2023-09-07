@@ -4,6 +4,7 @@ import TestReactivePlugin from '../fixtures/TestReactivePlugin';
 import TestList from '../fixtures/TestList';
 import TestPreExisting from '../fixtures/TestPreExisting';
 import TestDeferredMount from '../fixtures/TestDeferredMount';
+import TestPreExistingTemplate from '../fixtures/TestPreExistingTemplate';
 
 describe('Snowboard Reactivity package', () => {
     beforeEach(() => {
@@ -144,13 +145,13 @@ describe('Snowboard Reactivity package', () => {
 
         instance.show();
 
-        nextTick(() => {
+        instance.$nextTick(() => {
             expect(div.querySelector('p')).not.toBeNull();
             expect(div.querySelector('p').textContent).toBe('Hello');
 
             instance.hide();
 
-            nextTick(() => {
+            instance.$nextTick(() => {
                 expect(div.querySelector('p')).toBeNull();
             });
         });
@@ -165,7 +166,7 @@ describe('Snowboard Reactivity package', () => {
             </template>
         `;
 
-        Snowboard.addPlugin('testPreExisting', TestPreExisting);
+        Snowboard.addPlugin('testPreExisting', TestPreExistingTemplate);
 
         const instance = Snowboard.testPreExisting();
         const div = instance.$el;
@@ -198,7 +199,7 @@ describe('Snowboard Reactivity package', () => {
             </template>
         `;
 
-        Snowboard.addPlugin('testPreExisting', TestPreExisting);
+        Snowboard.addPlugin('testPreExisting', TestPreExistingTemplate);
 
         expect(() => {
             Snowboard.testPreExisting();

@@ -2,6 +2,8 @@ import { PluginBase } from '@wintercms/snowboard';
 import {
     reactivityConstructor,
     reactivityMount,
+    template,
+    mountTo,
 } from './shared';
 
 /**
@@ -16,6 +18,8 @@ import {
  *
  * @copyright 2023 Winter.
  * @author Ben Thomson <git@alfreido.com>
+ * @abstract
+ * @mixes Reactivity
  */
 class ReactivePluginBase extends PluginBase {
     constructor(snowboard) {
@@ -28,5 +32,7 @@ class ReactivePluginBase extends PluginBase {
 }
 
 ReactivePluginBase.prototype.$mount = reactivityMount;
+ReactivePluginBase.prototype.template = template;
+ReactivePluginBase.prototype.mountTo = mountTo;
 
 export default ReactivePluginBase;

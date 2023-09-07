@@ -15,6 +15,10 @@ export default class TestReactivePlugin extends ReactivePluginBase {
         `;
     }
 
+    mountTo() {
+        return document.body;
+    }
+
     get countText() {
         return `Count: ${this.count}`;
     }

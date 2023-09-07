@@ -2,6 +2,8 @@ import { Singleton } from '@wintercms/snowboard';
 import {
     reactivityConstructor,
     reactivityMount,
+    template,
+    mountTo,
 } from './shared';
 
 /**
@@ -29,5 +31,7 @@ class ReactiveSingleton extends Singleton {
 }
 
 ReactiveSingleton.prototype.$mount = reactivityMount;
+ReactiveSingleton.prototype.template = template;
+ReactiveSingleton.prototype.mountTo = mountTo;
 
 export default ReactiveSingleton;

@@ -11,4 +11,8 @@ export default class TestSnowboardTemplate extends ReactiveSingleton {
             </div>
         `;
     }
+
+    mountTo() {
+        return document.body;
+    }
 }

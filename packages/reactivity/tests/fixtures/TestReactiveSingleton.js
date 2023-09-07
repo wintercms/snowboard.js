@@ -15,6 +15,10 @@ export default class TestReactiveSingleton extends ReactiveSingleton {
         `;
     }
 
+    mountTo() {
+        return document.body;
+    }
+
     get countText() {
         return `Count: ${this.count}`;
     }

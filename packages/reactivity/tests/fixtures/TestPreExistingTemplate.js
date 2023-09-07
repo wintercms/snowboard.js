@@ -1,12 +1,16 @@
 import ReactivePluginBase from '../../src/abstracts/ReactivePluginBase';
 
-export default class TestPreExisting extends ReactivePluginBase {
+export default class TestPreExistingTemplate extends ReactivePluginBase {
     construct() {
         this.shown = false;
     }
 
-    mountTo() {
+    template() {
         return document.querySelector('#test');
+    }
+
+    mountTo() {
+        return document.body;
     }
 
     show() {
