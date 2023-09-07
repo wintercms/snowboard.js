@@ -98,7 +98,7 @@ function reactivityMount(element = null) {
         }
     }
 
-    createApp(this.$data).mount(mountedElement);
+    this.$app = createApp(this.$data).mount(mountedElement);
     this.$el = mountedElement;
 
     // Import next tick into plugin
@@ -210,9 +210,9 @@ function reactivityCreateStore(mappable) {
         if (prop.type === 'function') {
             Object.defineProperty(obj, key, {
                 configurable: true,
-                enumerable: false,
+                enumerable: true,
                 writable: true,
-                value: prop.value,
+                value: (...args) => this[key].call(this, ...args),
             });
         } else if (prop.type === 'getter') {
             Object.defineProperty(obj, key, {
@@ -220,7 +220,7 @@ function reactivityCreateStore(mappable) {
                 enumerable: false,
                 get: prop.value,
             });
-        } else {
+        } else if (prop.type === 'value') {
             Object.defineProperty(obj, key, {
                 configurable: true,
                 enumerable: true,
@@ -246,13 +246,13 @@ function reactivityCreateStore(mappable) {
  */
 function reactivityMapProperties(mappable) {
     Object.entries(mappable).forEach(([key, prop]) => {
-        if (prop.type === 'function' || prop.type === 'getter') {
+        if (prop.type === 'getter') {
             Object.defineProperty(
                 this,
                 key,
                 Object.getOwnPropertyDescriptor(this.$data, key),
             );
-        } else {
+        } else if (prop.type === 'value') {
             Object.defineProperty(this, key, {
                 get() { return this.$data[key]; },
                 set(value) { this.$data[key] = value; },
