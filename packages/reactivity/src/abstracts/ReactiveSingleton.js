@@ -4,7 +4,7 @@ import {
     reactivityMount,
     template,
     mountTo,
-} from './shared';
+} from '../lib/reactivity';
 
 /**
  * Reactive singleton abstract.

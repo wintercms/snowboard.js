@@ -1,4 +1,5 @@
 import { createApp, reactive } from 'petite-vue';
+import { componentDirective, prepareComponents } from './components';
 
 /**
  * @typedef {import('../abstracts/ReactivePluginBase').default} ReactivePluginBase
@@ -98,7 +99,12 @@ function reactivityMount(element = null) {
         }
     }
 
-    this.$app = createApp(this.$data).mount(mountedElement);
+    // Prepare components
+    prepareComponents(this, mountedElement);
+
+    this.$app = createApp(this.$data)
+        .directive('component', (context) => componentDirective(context, this))
+        .mount(mountedElement);
     this.$el = mountedElement;
 
     // Import next tick into plugin
