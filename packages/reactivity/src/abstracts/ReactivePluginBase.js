@@ -1,10 +1,6 @@
 import { PluginBase } from '@wintercms/snowboard';
-import {
-    reactivityConstructor,
-    reactivityMount,
-    template,
-    mountTo,
-} from '../lib/reactivity';
+import { reactivityConstructor, reactivityMount } from '../lib/reactivity';
+import { template, mountTo } from '../lib/template';
 
 /**
  * Reactive plugin base abstract.
