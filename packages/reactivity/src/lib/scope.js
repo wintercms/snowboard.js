@@ -33,6 +33,9 @@ function getMappableProperties() {
         'detach',
         'template',
         'mountTo',
+        'components',
+        '$app',
+        '$nextTick',
         '$reactive',
         '$mount',
         '$el',
@@ -161,8 +164,17 @@ function mapReactiveStore(mappable) {
     });
 }
 
+function updateReactiveStore(mappable) {
+    Object.entries(mappable).forEach(([key, prop]) => {
+        if (prop.type === 'value') {
+            this.$data[key] = prop.value;
+        }
+    });
+}
+
 export {
     getMappableProperties,
     createReactiveStore,
     mapReactiveStore,
+    updateReactiveStore,
 };

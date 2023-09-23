@@ -1,5 +1,10 @@
 import { createApp, reactive, nextTick } from 'petite-vue';
-import { getMappableProperties, createReactiveStore, mapReactiveStore } from './scope';
+import {
+    getMappableProperties,
+    createReactiveStore,
+    mapReactiveStore,
+    updateReactiveStore,
+} from './scope';
 import { getTemplate } from './template';
 
 /**
@@ -60,16 +65,25 @@ function prepareComponents(parent, mountElement) {
 }
 
 function updateDataStore(scope) {
-    const mappable = getMappableProperties.call(this);
-    const componentMappable = getMappableProperties.call({ ...scope });
+    nextTick(() => {
+        const mappable = getMappableProperties.call(this);
+        const componentMappable = getMappableProperties.call({ ...scope });
 
-    this.$data = reactive(createReactiveStore.call(this, {
-        ...mappable,
-        ...componentMappable,
-    }));
+        if (!Object.keys(this.$data).length) {
+            this.$data = reactive(createReactiveStore.call(this, {
+                ...mappable,
+                ...componentMappable,
+            }));
 
-    mapReactiveStore.call(this, mappable);
-    mapReactiveStore.call(this, componentMappable);
+            mapReactiveStore.call(this, mappable);
+            mapReactiveStore.call(this, componentMappable);
+        } else {
+            updateReactiveStore.call(this, {
+                ...mappable,
+                ...componentMappable,
+            });
+        }
+    });
 }
 
 /**
@@ -80,8 +94,12 @@ function updateDataStore(scope) {
  */
 function linkBlock(oldMount, newMount) {
     const block = this.$parent.$context.ctx.blocks.find((b) => b.template === oldMount);
-    block.template = newMount;
-    updateDataStore.call(this, block.ctx.scope);
+
+    if (block) {
+        block.template = newMount;
+        updateDataStore.call(this, block.ctx.scope);
+        this.$block = block;
+    }
 }
 
 /**
@@ -94,6 +112,13 @@ function componentCleanup(context, parent) {
     if (componentIndex !== -1) {
         parent.$components[context.exp].splice(componentIndex, 1);
     }
+
+    // Trigger data update on remaining components
+    Object.values(parent.$components).forEach((components) => {
+        components.forEach((component) => {
+            updateDataStore.call(component, component.$context.ctx.scope);
+        });
+    });
 }
 
 /**
