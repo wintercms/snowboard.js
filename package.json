@@ -35,6 +35,7 @@
     },
     "workspaces": [
         "packages/base",
+        "packages/controls",
         "packages/reactivity"
     ]
 }

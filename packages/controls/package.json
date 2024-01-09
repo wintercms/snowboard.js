@@ -1,0 +1,37 @@
+{
+    "name": "@wintercms/snowboard-controls",
+    "version": "0.5.0",
+    "description": "Controls module for Snowboard, providing linking of JavaScript functionality to HTML elements",
+    "keywords": [
+        "winter",
+        "wintercms",
+        "snowboard",
+        "framework",
+        "organization",
+        "management"
+    ],
+    "main": "dist/snowboard-controls.esm.js",
+    "scripts": {
+        "build": "npm run build:esm && npm run build:browser",
+        "build:browser": "rollup -c rollup.browser.config.mjs",
+        "build:esm": "rollup -c rollup.esm.config.mjs",
+        "lint": "eslint -c ../../.eslintrc.json --ext .js src tests",
+        "test": "jest -c ../../jest.config.js ./tests/**/*.test.js",
+        "prepublishOnly": "npm run build"
+    },
+    "author": "Ben Thomson <git@alfreido.com>",
+    "homepage": "https://wintercms.com",
+    "repository": "github:wintercms/snowboard.js",
+    "bugs": "https://github.com/wintercms/snowboard.js/issues",
+    "license": "MIT",
+    "peerDependencies": {
+        "@wintercms/snowboard": "*"
+    },
+    "files": [
+        "dist/*.js"
+    ],
+    "engines": {
+        "node": ">=14.18.0",
+        "npm": ">=8.0.0"
+    }
+}
