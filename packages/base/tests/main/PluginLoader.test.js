@@ -40,6 +40,9 @@ describe('PluginLoader class', () => {
         expect('testMethod' in after).toBe(true);
         expect(after.testMethod('with arg').str).toBe('Mocked with arg');
         expect(after.testMethod('with arg').thisInstance).toBeInstanceOf(TestPlugin);
+
+        // The instance created before the mock should not be affected
+        expect(before.testMethod()).toEqual('Tested');
     });
 
     it('is frozen on construction and doesn\'t allow prototype pollution', () => {
