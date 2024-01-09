@@ -7,11 +7,11 @@ description: "An introduction into what Snowboard.js is and its purpose."
 
 Snowboard.JS is a unique take on JavaScript development, with the main focus of the framework being to act as a lightweight, centralised application instance and a base to consolidate separate facets of your front-end functionality without imposing any barriers on what libraries and frameworks you wish to use for your user experience.
 
-It borrows a lot from the concepts of modern development in other languages and ports these into JavaScript in order to provide easy code reuse and interoperability, including features such as dependency management, plugins and singletons, traits and much more.
+It borrows a lot from the concepts of modern development in other languages and ports these into JavaScript in order to provide easy code reuse and interoperability, including features such as dependency management, plugins and singletons, traits and more. The plugin system, in particular, has been designed in a way that each plugin can be overridden.
 
-It is built using modern JavaScript syntax, allowing it to be used as a dependency to slot in to your own application, or it can be used directly in the browser by simply including a pre-compiled/transpiled JavaScript file.
+Snowboard.js is built using modern JavaScript syntax, allowing it to be used as a dependency to slot in to your own application, or it can be used directly in the browser by simply including a pre-compiled/transpiled JavaScript file.
 
-# History
+## History
 
 Snowboard.JS was originally written for [Winter CMS](https://wintercms.com), a highly-flexible PHP content management framework based off the [Laravel framework](https://laravel.com).
 
