@@ -17,6 +17,7 @@ describe('The Configurable trait', () => {
 
     afterEach(() => {
         document.body.innerHTML = '';
+        window.Snowboard.tearDown();
     });
 
     it('initializes correctly on a plugin instance', () => {

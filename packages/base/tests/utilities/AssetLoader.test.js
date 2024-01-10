@@ -8,6 +8,10 @@ describe('AssetLoader utility', () => {
         window.Snowboard = new TestInstance();
     });
 
+    afterEach(() => {
+        window.Snowboard.tearDown();
+    });
+
     it('can load a script', async () => {
         expect.assertions(6);
 

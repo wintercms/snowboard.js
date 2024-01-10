@@ -65,6 +65,7 @@ export default class Snowboard {
         this.readiness = {
             dom: false,
         };
+
         // Seal readiness from being added to further, but allow the properties to be modified.
         Object.seal(this.readiness);
         this.attachAbstracts();
@@ -190,6 +191,29 @@ export default class Snowboard {
         }
 
         window.addEventListener('DOMContentLoaded', ready);
+    }
+
+    /**
+     * Tears down an entire Snowboard instance.
+     *
+     * While this is mainly used for tests, it may be useful in cases where you want to completely
+     * destruct all plugins and tear down the app into a clean slate.
+     *
+     * This will also remove all registered plugins, abstracts, and traits.
+     *
+     * @return {void}
+     */
+    tearDown() {
+        this.plugins.forEach((plugin, name) => {
+            plugin.getInstances().forEach((instance) => {
+                instance.destructor();
+            });
+            this.plugins.delete(name);
+        });
+
+        this.abstracts.clear();
+        this.traits.clear();
+        this.listeners.clear();
     }
 
     /**

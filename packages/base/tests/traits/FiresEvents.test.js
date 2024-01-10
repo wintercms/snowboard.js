@@ -12,6 +12,10 @@ describe('The FiresEvents trait', () => {
         window.Snowboard = new TestInstance();
     });
 
+    afterEach(() => {
+        window.Snowboard.tearDown();
+    });
+
     it('requires an event prefix if global events are enabled', () => {
         Snowboard.addPlugin('testEvent', TestNoEventPrefix);
 

@@ -17,6 +17,7 @@ export default class PluginBase {
      */
     constructor(snowboard) {
         this.snowboard = snowboard;
+        this.destructed = false;
     }
 
     /**
@@ -78,5 +79,6 @@ export default class PluginBase {
         this.destruct();
         this.detach();
         delete this.snowboard;
+        this.destructed = true;
     }
 }

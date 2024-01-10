@@ -10,6 +10,10 @@ describe('PluginLoader class', () => {
         window.Snowboard = new TestInstance();
     });
 
+    afterEach(() => {
+        window.Snowboard.tearDown();
+    });
+
     it('can mock existing methods on a singleton', () => {
         Snowboard.getPlugin('sanitizer').mock('sanitize', () => 'all good');
 

@@ -20,6 +20,10 @@ describe('Snowboard framework', () => {
         window.Snowboard = new TestInstance();
     });
 
+    afterEach(() => {
+        window.Snowboard.tearDown();
+    });
+
     it('initialises correctly', () => {
         expect(Snowboard).toBeDefined();
         expect(Snowboard.addPlugin).toBeDefined();
@@ -535,5 +539,27 @@ describe('Snowboard framework', () => {
         expect(groupCollapsedSpy).toHaveBeenNthCalledWith(3, '%cTrace', 'color: rgb(45, 167, 199); font-weight: bold;');
         expect(traceSpy).toHaveBeenCalled();
         expect(groupEndSpy).toHaveBeenCalled();
+    });
+
+    it('can be torn down', () => {
+        Snowboard.addPlugin('testDependencyTwo', TestDependencyTwo);
+        Snowboard.addPlugin('testHasDependencies', TestHasDependencies);
+        Snowboard.addPlugin('testDependencyOne', TestDependencyOne);
+
+        const instance = Snowboard.testHasDependencies();
+
+        expect(Snowboard.plugins.has('testhasdependencies')).toEqual(true);
+        expect(Snowboard.plugins.get('testhasdependencies').getInstances()).toEqual([instance]);
+
+        Snowboard.tearDown();
+
+        expect(Snowboard.plugins.has('testhasdependencies')).toEqual(false);
+        expect(Snowboard.plugins.get('testhasdependencies')).toBeUndefined();
+        expect(instance.destructed).toBe(true);
+
+        expect(Snowboard.plugins.size).toEqual(0);
+        expect(Snowboard.abstracts.size).toEqual(0);
+        expect(Snowboard.traits.size).toEqual(0);
+        expect(Snowboard.listeners.size).toEqual(0);
     });
 });

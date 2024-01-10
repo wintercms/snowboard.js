@@ -1,6 +1,12 @@
 import TestInstance from '../../src/main/Snowboard';
 
 describe('Url utility', () => {
+    afterEach(() => {
+        if (window.snowBoard) {
+            window.Snowboard.tearDown();
+        }
+    });
+
     it('can get base and asset URLs from data attributes on current script', () => {
         document.currentScript.dataset.baseUrl = 'https://example.com';
         document.currentScript.dataset.assetUrl = 'https://example.com/assets/';

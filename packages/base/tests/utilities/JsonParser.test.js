@@ -8,6 +8,10 @@ describe('JsonParser utility', () => {
         window.Snowboard = new TestInstance();
     });
 
+    afterEach(() => {
+        window.Snowboard.tearDown();
+    });
+
     it('parses a null or undefined', () => {
         expect(Snowboard.jsonParser().parse('null')).toEqual(null);
         expect(Snowboard.jsonParser().parse('undefined')).toBeUndefined();

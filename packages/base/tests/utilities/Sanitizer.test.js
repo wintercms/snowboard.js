@@ -8,6 +8,10 @@ describe('Sanitizer utility', () => {
         window.Snowboard = new TestInstance();
     });
 
+    afterEach(() => {
+        window.Snowboard.tearDown();
+    });
+
     it('sanitizes some common XSS vectors', () => {
         const html = `<div onclick="javascript:alert(1)">
             <script src="/myscript.js"></script>
