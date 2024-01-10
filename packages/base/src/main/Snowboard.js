@@ -40,24 +40,24 @@ export default class Snowboard {
         this.debugEnabled = (typeof debug === 'boolean' && debug === true);
         /**
          * Registered plugins.
-         * @type {Object.<string, PluginLoader>}
+         * @type {Map.<string, PluginLoader>}
          */
-        this.plugins = {};
+        this.plugins = new Map();
         /**
          * Registered abstracts.
-         * @type {Object.<string, object>}
+         * @type {Map.<string, object>}
          */
-        this.abstracts = {};
+        this.abstracts = new Map();
         /**
          * Registered traits.
-         * @type {Object.<string, object>}
+         * @type {Map.<string, object>}
          */
-        this.traits = {};
+        this.traits = new Map();
         /**
          * Listeners, keyed by event name.
-         * @type {Object.<string, Array.<function>}
+         * @type {Map.<string, Array.<function>}
          */
-        this.listeners = {};
+        this.listeners = new Map();
         /**
          * Readiness tracking for the framework.
          * @type {{dom: boolean}}
@@ -138,9 +138,9 @@ export default class Snowboard {
             throw new Error('The given name is already in use for a property or method of the Snowboard class.');
         }
 
-        this.abstracts[name] = instance;
-        Object.freeze(this.abstracts[name]);
-        Object.freeze(this.abstracts[name].prototype);
+        Object.freeze(instance);
+        Object.freeze(instance.prototype);
+        this.abstracts.set(name, instance);
     }
 
     /**
@@ -150,7 +150,7 @@ export default class Snowboard {
      * @return {boolean}
      */
     hasAbstract(name) {
-        return (this.abstracts[name] !== undefined);
+        return this.abstracts.has(name);
     }
 
     /**
@@ -198,7 +198,7 @@ export default class Snowboard {
      * @return {void}
      */
     initialiseSingletons() {
-        Object.values(this.plugins).forEach((plugin) => {
+        this.plugins.forEach((plugin) => {
             if (plugin.isSingleton() && plugin.dependenciesFulfilled()) {
                 plugin.initialiseSingleton();
             }
@@ -238,7 +238,7 @@ export default class Snowboard {
             throw new Error('The given name is already in use for a property or method of the Snowboard class.');
         }
 
-        this.plugins[lowerName] = new PluginLoader(lowerName, this, instance);
+        this.plugins.set(lowerName, new PluginLoader(lowerName, this, instance));
 
         this.debug(`Plugin "${name}" registered`);
 
@@ -277,11 +277,11 @@ export default class Snowboard {
         const lowerName = name.toLowerCase();
 
         // Call destructors for all instances
-        this.plugins[lowerName].getInstances().forEach((instance) => {
+        this.plugins.get(lowerName).getInstances().forEach((instance) => {
             instance.destructor();
         });
 
-        delete this.plugins[lowerName];
+        this.plugins.delete(lowerName);
 
         this.debug(`Plugin "${name}" removed`);
     }
@@ -297,13 +297,13 @@ export default class Snowboard {
     hasPlugin(name) {
         const lowerName = name.toLowerCase();
 
-        return (this.plugins[lowerName] !== undefined);
+        return this.plugins.has(lowerName);
     }
 
     /**
      * Returns an array of registered plugins as PluginLoader objects.
      *
-     * @return {Object.<string, PluginLoader>}
+     * @return {Map.<string, PluginLoader>}
      */
     getPlugins() {
         return this.plugins;
@@ -315,7 +315,7 @@ export default class Snowboard {
      * @return {string[]}
      */
     getPluginNames() {
-        return Object.keys(this.plugins);
+        return Array.from(this.plugins.keys());
     }
 
     /**
@@ -328,7 +328,7 @@ export default class Snowboard {
             throw new Error(`No plugin called "${name}" has been registered.`);
         }
 
-        return this.plugins[name.toLowerCase()];
+        return this.plugins.get(name.toLowerCase());
     }
 
     /**
@@ -358,7 +358,7 @@ export default class Snowboard {
             throw new Error('The given name is already in use for a property or method of the Snowboard class.');
         }
 
-        this.traits[lowerName] = instance;
+        this.traits.set(lowerName, instance);
 
         this.debug(`Trait "${name}" registered`);
     }
@@ -372,13 +372,13 @@ export default class Snowboard {
     hasTrait(name) {
         const lowerName = name.toLowerCase();
 
-        return (this.traits[lowerName] !== undefined);
+        return this.traits.has(lowerName);
     }
 
     /**
      * Returns an array of registered traits as individual class objects.
      *
-     * @return {Object.<string, object>}
+     * @return {Map.<string, object>}
      */
     getTraits() {
         return this.traits;
@@ -396,7 +396,7 @@ export default class Snowboard {
 
         const lowerName = name.toLowerCase();
 
-        return this.traits[lowerName];
+        return this.traits.get(lowerName);
     }
 
     /**
@@ -411,9 +411,7 @@ export default class Snowboard {
     listensToEvent(eventName) {
         const plugins = [];
 
-        Object.entries(this.plugins).forEach((entry) => {
-            const [name, plugin] = entry;
-
+        this.plugins.forEach((plugin, name) => {
             if (!plugin.dependenciesFulfilled()) {
                 return;
             }
@@ -457,12 +455,12 @@ export default class Snowboard {
      * @return {void}
      */
     on(eventName, callback) {
-        if (!this.listeners[eventName]) {
-            this.listeners[eventName] = [];
+        if (!this.listeners.has(eventName)) {
+            this.listeners.set(eventName, []);
         }
 
-        if (!this.listeners[eventName].includes(callback)) {
-            this.listeners[eventName].push(callback);
+        if (!this.listeners.get(eventName).includes(callback)) {
+            this.listeners.get(eventName).push(callback);
         }
     }
 
@@ -474,16 +472,16 @@ export default class Snowboard {
      * @return {void}
      */
     off(eventName, callback) {
-        if (!this.listeners[eventName]) {
+        if (!this.listeners.has(eventName)) {
             return;
         }
 
-        const index = this.listeners[eventName].indexOf(callback);
+        const index = this.listeners.get(eventName).indexOf(callback);
         if (index === -1) {
             return;
         }
 
-        this.listeners[eventName].splice(index, 1);
+        this.listeners.get(eventName).splice(index, 1);
     }
 
     /**
@@ -559,10 +557,14 @@ export default class Snowboard {
         }
 
         // Find ad-hoc listeners for this event.
-        if (!cancelled && this.listeners[eventName] && this.listeners[eventName].length > 0) {
-            this.debug(`Found ${this.listeners[eventName].length} ad-hoc listener(s) for global event "${eventName}"`);
+        if (
+            !cancelled
+            && this.listeners.has(eventName)
+            && this.listeners.get(eventName).length > 0
+        ) {
+            this.debug(`Found ${this.listeners.get(eventName).length} ad-hoc listener(s) for global event "${eventName}"`);
 
-            this.listeners[eventName].forEach((listener) => {
+            this.listeners.get(eventName).forEach((listener) => {
                 // If a listener has cancelled the event, no further listeners are considered.
                 if (cancelled) {
                     return;
@@ -662,10 +664,13 @@ export default class Snowboard {
         }
 
         // Find ad-hoc listeners listening to this event.
-        if (this.listeners[eventName] && this.listeners[eventName].length > 0) {
-            this.debug(`Found ${this.listeners[eventName].length} ad-hoc listener(s) for global promise event "${eventName}"`);
+        if (
+            this.listeners.has(eventName)
+            && this.listeners.get(eventName).length > 0
+        ) {
+            this.debug(`Found ${this.listeners.get(eventName).length} ad-hoc listener(s) for global promise event "${eventName}"`);
 
-            this.listeners[eventName].forEach((listener) => {
+            this.listeners.get(eventName).forEach((listener) => {
                 try {
                     const listenerPromise = listener(...parameters);
                     if (listenerPromise instanceof Promise === false) {

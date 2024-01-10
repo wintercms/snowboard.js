@@ -39,8 +39,18 @@ export default class PluginLoader {
         // Prevent further extension of the singleton status object
         Object.seal(this.singleton);
 
-        this.mocks = {};
-        this.originalFunctions = {};
+        /**
+         * Mocked methods.
+         *
+         * @type {Map<string, Function>}
+         */
+        this.mocks = new Map();
+        /**
+         * Original method functionality storage.
+         *
+         * @type {Map<string, Function>}
+         */
+        this.originalFunctions = new Map();
 
         // Freeze loader itself
         Object.freeze(PluginLoader.prototype);
@@ -93,13 +103,11 @@ export default class PluginLoader {
             }
 
             // Apply mocked methods to singleton instance
-            if (Object.keys(this.mocks).length > 0) {
-                Object.entries(this.originalFunctions).forEach((entry) => {
-                    const [methodName, callback] = entry;
+            if (this.mocks.size > 0) {
+                this.originalFunctions.forEach((callback, methodName) => {
                     this.instances[0][methodName] = callback;
                 });
-                Object.entries(this.mocks).forEach((entry) => {
-                    const [methodName, callback] = entry;
+                this.mocks.forEach((callback, methodName) => {
                     this.instances[0][methodName] = (...params) => callback(
                         this.instances[0],
                         ...params,
@@ -113,13 +121,11 @@ export default class PluginLoader {
         const newInstance = new this.instance(this.snowboard, ...parameters);
 
         // Apply mocked methods to instance
-        if (Object.keys(this.mocks).length > 0) {
-            Object.entries(this.originalFunctions).forEach((entry) => {
-                const [methodName, callback] = entry;
+        if (this.mocks.size > 0) {
+            this.originalFunctions.forEach((callback, methodName) => {
                 newInstance[methodName] = callback;
             });
-            Object.entries(this.mocks).forEach((entry) => {
-                const [methodName, callback] = entry;
+            this.mocks.forEach((callback, methodName) => {
                 newInstance[methodName] = (...params) => callback(newInstance, ...params);
             });
         }
@@ -228,8 +234,8 @@ export default class PluginLoader {
             throw new Error(`Function "${methodName}" does not exist and cannot be mocked`);
         }
 
-        this.mocks[methodName] = callback;
-        this.originalFunctions[methodName] = this.instance.prototype[methodName];
+        this.mocks.set(methodName, callback);
+        this.originalFunctions.set(methodName, this.instance.prototype[methodName]);
 
         if (this.isSingleton() && this.instances.length === 0) {
             this.initialiseSingleton();
@@ -245,16 +251,16 @@ export default class PluginLoader {
      * @param {string} methodName
      */
     unmock(methodName) {
-        if (!this.mocks[methodName]) {
+        if (!this.mocks.has(methodName)) {
             return;
         }
 
         if (this.isSingleton()) {
-            this.instances[0][methodName] = this.originalFunctions[methodName];
+            this.instances[0][methodName] = this.originalFunctions.get(methodName);
         }
 
-        delete this.mocks[methodName];
-        delete this.originalFunctions[methodName];
+        this.mocks.delete(methodName);
+        this.originalFunctions.delete(methodName);
     }
 
     /**

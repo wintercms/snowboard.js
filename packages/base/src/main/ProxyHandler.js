@@ -1,10 +1,12 @@
 export default {
     get(target, prop, receiver) {
         if (typeof prop === 'string' && target.hasAbstract(prop)) {
-            return Reflect.get(target, 'abstracts')[prop];
+            return Reflect.get(target, 'abstracts')
+                .get(prop);
         }
         if (typeof prop === 'string' && target.hasPlugin(prop)) {
-            return (...params) => Reflect.get(target, 'plugins')[prop.toLowerCase()]
+            return (...params) => Reflect.get(target, 'plugins')
+                .get(prop.toLowerCase())
                 .getInstance(...params);
         }
 

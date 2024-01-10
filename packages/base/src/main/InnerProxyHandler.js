@@ -18,7 +18,9 @@ export default {
             }
 
             if (target.hasPlugin(propLower)) {
-                return (...params) => Reflect.get(target, 'plugins')[propLower].getInstance(...params);
+                return (...params) => Reflect.get(target, 'plugins')
+                    .get(propLower)
+                    .getInstance(...params);
             }
         }
 
