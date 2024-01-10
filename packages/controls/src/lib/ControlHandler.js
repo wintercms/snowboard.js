@@ -1,3 +1,7 @@
+/**
+ * @typedef {import('../abstracts/Control').default} Control
+ */
+
 import { Singleton } from '@wintercms/snowboard';
 
 /**
@@ -18,7 +22,9 @@ export default class ControlHandler extends Singleton {
     construct(rootElement = document.body) {
         /**
          * Registered controls.
-         * @type {Object[]}
+         * @type {Array.<{
+         *  name: String, pluginName: String, control: Control, callback: Function
+         * }>}
          */
         this.registeredControls = [];
         /**
@@ -28,7 +34,7 @@ export default class ControlHandler extends Singleton {
         this.rootElement = rootElement;
         /**
          * The elements where controls have been initialized.
-         * @type {HTMLElement[]}
+         * @type {Array.<{element: HTMLElement, control: String, instance: Control}>}}
          */
         this.elements = [];
         /**
@@ -62,7 +68,6 @@ export default class ControlHandler extends Singleton {
      * Initializes controls within the entire root element.
      */
     onReady() {
-        console.log('Ready');
         this.initializeControls(this.rootElement);
 
         // Register a DOM observer and watch for any removed nodes
@@ -98,7 +103,7 @@ export default class ControlHandler extends Singleton {
      * parameters.
      *
      * @param {String} name
-     * @param {Snowboard.Control} control
+     * @param {Control} control
      * @param {Function} callback
      */
     register(name, control, callback) {
@@ -128,7 +133,7 @@ export default class ControlHandler extends Singleton {
      */
     unregister(control) {
         this.registeredControls = this.registeredControls.filter(
-            (widget) => widget.control !== control,
+            (widget) => widget.name !== control,
         );
     }
 
@@ -158,9 +163,11 @@ export default class ControlHandler extends Singleton {
                     const controlInstance = this.snowboard[control.pluginName](instance);
                     this.elements.push({
                         element: instance,
+                        control: control.name,
                         instance: controlInstance,
                     });
                     instance.dataset.controlInitialized = true;
+                    instance.control = controlInstance;
                     this.snowboard.globalEvent('control.initialized', instance, controlInstance);
 
                     if (typeof control.callback === 'function') {
@@ -175,7 +182,7 @@ export default class ControlHandler extends Singleton {
      * Returns a control instance that is attached to the given element, if any.
      *
      * @param {HTMLElement} element
-     * @returns {Snowboard.Control|null}
+     * @returns {Control|null}
      */
     getControl(element) {
         const found = this.elements.find((control) => control.element === element);
@@ -188,9 +195,28 @@ export default class ControlHandler extends Singleton {
     }
 
     /**
+     * Gets all instances of a control by name.
+     *
+     * @param {String} name
+     * @returns {Control[]}
+     */
+    getInstances(name) {
+        const registered = this.registeredControls.some((control) => control.name === name);
+
+        if (!registered) {
+            throw new Error(`Control "${name}" is not registered.`);
+        }
+
+        return this.elements
+            .filter((element) => element.control === name)
+            .map((element) => element.instance);
+    }
+
+    /**
      * Callback for mutation events.
      *
-     * We're only tracking removed nodes, to ensure that those controls are disposed of.
+     * We're only tracking removed nodes, to ensure that those controls (and any controls of
+     * descendant nodes) are disposed of.
      *
      * @param {MutationRecord[]} mutations
      */
@@ -207,6 +233,7 @@ export default class ControlHandler extends Singleton {
 
         removedNodes.forEach((node) => {
             const controls = this.elements.filter((control) => node.contains(control.element));
+
             if (controls.length) {
                 controls.forEach((control) => {
                     control.instance.destructor();
