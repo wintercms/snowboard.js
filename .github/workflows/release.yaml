@@ -50,6 +50,26 @@ jobs:
           asset_name: snowboard.min.js
           asset_content_type: application/javascript
 
+      - name: Upload release asset snowboard-controls.js
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./packages/controls/dist/snowboard-controls.js
+          asset_name: snowboard-controls.js
+          asset_content_type: application/javascript
+
+      - name: Upload release asset snowboard-controls.min.js
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./packages/controls/dist/snowboard-controls.min.js
+          asset_name: snowboard-controls.min.js
+          asset_content_type: application/javascript
+
       - name: Upload release asset snowboard-reactivity.js
         uses: actions/upload-release-asset@v1
         env:
