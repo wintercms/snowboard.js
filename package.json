@@ -1,4 +1,6 @@
 {
+    "name": "snowboard",
+    "private": true,
     "scripts": {
         "lint": "eslint --ext .js packages/*/src packages/*/tests",
         "test": "jest",
