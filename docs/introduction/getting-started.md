@@ -1,6 +1,8 @@
 ---
+layout: default
 title: "Introduction: Getting Started"
-description: "How to get started with Snowboard.js"
+parent: Introduction
+nav_order: 2
 ---
 
 # Getting Started

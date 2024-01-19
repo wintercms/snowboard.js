@@ -1,6 +1,8 @@
 ---
+layout: default
 title: "Snowboard.js"
 description: "The standalone version of the [Winter CMS](https://wintercms.com) JavaScript framework"
+nav_order: 1
 ---
 
 # Snowboard.js Framework

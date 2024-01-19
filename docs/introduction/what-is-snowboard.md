@@ -1,9 +1,14 @@
 ---
+layout: default
 title: "Introduction: What is Snowboard.js?"
-description: "An introduction into what Snowboard.js is and its purpose."
+parent: Introduction
+nav_order: 1
 ---
 
 # What is Snowboard.JS?
+
+An introduction into what Snowboard.js is, and its purpose.
+{: .fs-6 .fw-300 }
 
 Snowboard.JS is a unique take on JavaScript development, with the main focus of the framework being to act as a lightweight, centralised application instance and a base to consolidate separate facets of your front-end functionality without imposing any barriers on what libraries and frameworks you wish to use for your user experience.
 
