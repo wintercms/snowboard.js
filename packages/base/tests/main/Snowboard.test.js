@@ -11,6 +11,7 @@ import TestDependencyTwo from '../fixtures/framework/TestDependencyTwo';
 import TestSingletonWithDependency from '../fixtures/framework/TestSingletonWithDependency';
 import TestSingletonWithReady from '../fixtures/framework/TestSingletonWithReady';
 import TestTrait from '../fixtures/framework/TestTrait';
+import TestNotPlugin from '../fixtures/framework/TestNotPlugin';
 
 describe('Snowboard framework', () => {
     beforeEach(() => {
@@ -109,6 +110,9 @@ describe('Snowboard framework', () => {
         expect(instance.testMethod).toEqual(expect.any(Function));
         expect(instance.testMethod()).toEqual('Tested');
 
+        // Check that the plugin is not a singleton
+        expect(Snowboard.getPlugin('testPlugin').isSingleton()).toEqual(false);
+
         // Check multiple instances
         const instanceOne = Snowboard.testPlugin();
         instanceOne.changed = true;
@@ -124,6 +128,12 @@ describe('Snowboard framework', () => {
             expect.arrayContaining(['testplugin']),
         );
         expect(Snowboard.testPlugin).not.toBeDefined();
+    });
+
+    it('won\'t add a plugin that doesn\'t appear to be a plugin', () => {
+        expect(() => {
+            Snowboard.addPlugin('testNotPlugin', TestNotPlugin);
+        }).toThrow('must extend the PluginBase class');
     });
 
     it('can add and remove a singleton', () => {
@@ -153,6 +163,9 @@ describe('Snowboard framework', () => {
         expect(instance.testMethod).toBeDefined();
         expect(instance.testMethod).toEqual(expect.any(Function));
         expect(instance.testMethod()).toEqual('Tested');
+
+        // Check that the plugin is a singleton
+        expect(Snowboard.getPlugin('testSingleton').isSingleton()).toEqual(true);
 
         // Check multiple instances  (these should all be the same as this instance is a singleton)
         const instanceOne = Snowboard.testSingleton();

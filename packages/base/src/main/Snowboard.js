@@ -127,8 +127,8 @@ export default class Snowboard {
         }
 
         if (
-            (instance === PluginBase) === false
-            && instance.prototype instanceof PluginBase === false
+            (instance !== PluginBase)
+            && !this.isPluginBase(instance)
         ) {
             throw new Error('The provided abstract must extend the PluginBase class');
         }
@@ -252,7 +252,7 @@ export default class Snowboard {
             throw new Error(`A plugin or abstract called "${name}" is already registered.`);
         }
 
-        if (instance.prototype instanceof PluginBase === false) {
+        if (!this.isPluginBase(instance)) {
             throw new Error('The provided plugin must extend the PluginBase class');
         }
 
@@ -353,6 +353,41 @@ export default class Snowboard {
         }
 
         return this.plugins.get(name.toLowerCase());
+    }
+
+    /**
+     * Determines if the instance provided uses the plugin base.
+     *
+     * This is a simple API check because some build processes muck up the prototype chain and
+     * prevent the usage of "instanceof" to check against the `PluginBase` class.
+     *
+     * @param {*} instance
+     */
+    isPluginBase(instance) {
+        const methods = new Set();
+        let obj = instance.prototype;
+
+        Reflect.ownKeys(obj).forEach((key) => methods.add(key));
+
+        while (Reflect.getPrototypeOf(obj)) {
+            obj = Reflect.getPrototypeOf(obj);
+            Reflect.ownKeys(obj).forEach((key) => methods.add(key));
+        }
+
+        if (
+            methods.has('construct')
+            && methods.has('getSnowboard')
+            && methods.has('isSingleton')
+            && methods.has('init')
+            && methods.has('dependencies')
+            && methods.has('listens')
+            && methods.has('destruct')
+            && methods.has('destructor')
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

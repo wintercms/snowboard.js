@@ -13,4 +13,7 @@ import PluginBase from './PluginBase';
  * @author Ben Thomson <git@alfreido.com>
  */
 export default class Singleton extends PluginBase {
+    isSingleton() {
+        return true;
+    }
 }

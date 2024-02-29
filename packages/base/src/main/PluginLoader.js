@@ -154,7 +154,7 @@ export default class PluginLoader {
      * @returns {boolean}
      */
     isSingleton() {
-        return this.instance.prototype instanceof Singleton === true;
+        return this.instance.prototype.isSingleton() === true;
     }
 
     /**

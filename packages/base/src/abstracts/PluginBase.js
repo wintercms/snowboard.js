@@ -21,6 +21,20 @@ export default class PluginBase {
     }
 
     /**
+     * Gets the Snowboard instance that this plugin is attached to.
+     */
+    getSnowboard() {
+        return this.snowboard;
+    }
+
+    /**
+     * Determines if this plugin is a singleton.
+     */
+    isSingleton() {
+        return false;
+    }
+
+    /**
      * Plugin constructor.
      *
      * This method should be treated as the true constructor of a plugin, and can be overwritten.
