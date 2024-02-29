@@ -1,6 +1,6 @@
 {
     "name": "@wintercms/snowboard-controls",
-    "version": "0.6.0",
+    "version": "0.6.1",
     "description": "Controls module for Snowboard, providing linking of JavaScript functionality to HTML elements",
     "keywords": [
         "winter",
