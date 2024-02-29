@@ -1,4 +1,3 @@
-import Singleton from '../abstracts/Singleton';
 import InnerProxyHandler from './InnerProxyHandler';
 
 /**
