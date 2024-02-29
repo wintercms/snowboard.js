@@ -16,10 +16,8 @@ import { Singleton } from '@wintercms/snowboard';
 export default class ControlHandler extends Singleton {
     /**
      * Constructor.
-     *
-     * @param {HTMLElement} rootElement Defines the root element to watch for controls.
      */
-    construct(rootElement = document.body) {
+    construct() {
         /**
          * Registered controls.
          * @type {Array.<{
@@ -27,11 +25,6 @@ export default class ControlHandler extends Singleton {
          * }>}
          */
         this.registeredControls = [];
-        /**
-         * The root element to watch for controls.
-         * @type {HTMLElement}
-         */
-        this.rootElement = rootElement;
         /**
          * The elements where controls have been initialized.
          * @type {Array.<{element: HTMLElement, control: String, instance: Control}>}}
@@ -65,15 +58,15 @@ export default class ControlHandler extends Singleton {
     /**
      * Ready handler.
      *
-     * Initializes controls within the entire root element.
+     * Initializes controls within the entire HTML body.
      */
     onReady() {
-        this.initializeControls(this.rootElement);
+        this.initializeControls(document.body);
 
         // Register a DOM observer and watch for any removed nodes
         if (!this.observer) {
             this.observer = new MutationObserver(this.events.mutate);
-            this.observer.observe(this.rootElement, {
+            this.observer.observe(document.body, {
                 childList: true,
                 subtree: true,
             });
