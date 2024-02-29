@@ -1,6 +1,6 @@
 {
     "name": "@wintercms/snowboard-reactivity",
-    "version": "0.6.1",
+    "version": "0.6.2",
     "description": "Reactivity module for Snowboard, built on top of Petite-Vue",
     "keywords": [
         "winter",
