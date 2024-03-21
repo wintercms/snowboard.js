@@ -1,6 +1,6 @@
 ---
 layout: default
-title: "Introduction: What is Snowboard.js?"
+title: What is Snowboard.js?
 parent: Introduction
 nav_order: 1
 ---
