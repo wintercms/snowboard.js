@@ -5,12 +5,19 @@ parent: Concepts
 nav_order: 1
 ---
 
-# The Snowboard instance
+# The Snowboard instance {: .no_toc }
 
 The central instance in any Snowboard-built application.
 {: .fs-6 .fw-300 }
 
+<details open markdown="block">
+  <summary>
+    Table of contents
+  </summary>
+  {: .text-delta }
+- TOC
 {:toc}
+</details>
 
 The Snowboard instance is the main instance used in any application built using the Snowboard framework. It can be thought of as a [container](https://en.wikipedia.org/wiki/Containerization_(computing)) - an isolated environment in which plugins and functionality are loaded and executed in a given scope.
 
